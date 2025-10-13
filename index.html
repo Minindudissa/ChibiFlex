@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Discover adorable 3D printable flexi models designed for makers of all ages. Fun, fidget-friendly articulated designs – only at Chibiflex."
+    />
+    <meta
+      property="og:title"
+      content="Chibi Flex – Cute 3D Printable Flexi Models & Articulated Design"
+    />
+    <meta
+      property="og:description"
+      content="Discover adorable 3D printable flexi models designed for makers of all ages. Fun, fidget-friendly articulated designs – only at Chibiflex."
+    />
+    <meta property="og:image" content="Resources/Logo/Logo Round.png" />
+    <title>
+      Chibi Flex – Cute 3D Printable Flexi Models & Articulated Designs
+    </title>
+    <link rel="icon" type="image/png" href="Resources/Logo/Logo Round.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Add Swiper JS and CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <style>
+      /* ===== BASE STYLES ===== */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary-black: #0a0a0a;
+        --secondary-black: #1a1a1a;
+        --primary-white: #ffffff;
+        --accent-white: #f0f0f0;
+        --transition: all 0.3s ease;
+        --section-padding: 6rem 5%;
+        --border-radius: 10px;
+        --container-width: 90%;
+      }
+
+      body {
+        background-color: var(--primary-black);
+        color: var(--primary-white);
+        font-family: "Inter", "Segoe UI", sans-serif;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      /* ===== LAYOUT & CONTAINERS ===== */
+      .container {
+        width: var(--container-width);
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      /* ===== HEADER & NAVIGATION ===== */
+      header {
+        padding: 1.5rem 5%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        background: #0a0a0a;
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo {
+        width: 80px;
+        height: 80px;
+        background: var(--primary-white);
+        border-radius: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 20px;
+      }
+
+      .logo-text {
+        font-size: 1.8rem;
+        font-weight: 700;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+        gap: 2rem;
+      }
+
+      nav ul li a {
+        color: var(--primary-white);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+        position: relative;
+        padding: 0.5rem 0;
+      }
+
+      nav ul li a::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--primary-white);
+        transition: var(--transition);
+      }
+
+      nav ul li a:hover::after {
+        width: 100%;
+      }
+
+      .menu-toggle {
+        display: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+
+      /* ===== HERO SECTION ===== */
+      .hero {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        margin-top: 150px;
+        position: relative;
+        background-image: url("Resources/Site_Images/1.jpg");
+        background-position: top;
+        background-repeat: no-repeat;
+        background-size: contain;
+        padding: 0px;
+      }
+
+      .hero-content {
+        max-width: 650px;
+        z-index: 2;
+        padding: 0 5%;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.2rem, 5vw, 3.5rem);
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+        font-weight: 800;
+      }
+
+      .hero p {
+        font-size: clamp(1rem, 2.5vw, 1.2rem);
+        margin-bottom: 2rem;
+        color: var(--accent-white);
+        max-width: 90%;
+      }
+
+      /* ===== BUTTONS ===== */
+      .btn {
+        display: inline-block;
+        padding: 0.9rem 2.5rem;
+        background: transparent;
+        color: var(--primary-white);
+        border: 2px solid var(--primary-white);
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: var(--transition);
+        letter-spacing: 1px;
+      }
+
+      .btn:hover {
+        background: var(--primary-white);
+        color: var(--primary-black);
+      }
+
+      /* ===== SECTION COMMON STYLES ===== */
+      .section-title {
+        font-size: clamp(2rem, 5vw, 2.5rem);
+        margin-bottom: 2.5rem;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 0.5rem;
+      }
+
+      .section-title::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60%;
+        height: 3px;
+        background: var(--primary-white);
+      }
+
+      /* ===== PORTFOLIO SECTION ===== */
+      .portfolio {
+        padding: var(--section-padding);
+      }
+
+      .portfolio-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+      }
+
+      .portfolio-item {
+        background: var(--secondary-black);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        position: relative;
+        aspect-ratio: 1 / 1;
+        border-radius: 5px;
+        transition: var(--transition);
+      }
+
+      .portfolio-item:hover {
+        border-color: var(--primary-white);
+      }
+
+      .portfolio-img {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        object-fit: cover;
+        transition: var(--transition);
+      }
+
+      .portfolio-item:hover .portfolio-img {
+        transform: scale(1.05);
+      }
+
+      .portfolio-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 1.5rem;
+        transform: translateY(100%);
+        transition: var(--transition);
+      }
+
+      .portfolio-item:hover .portfolio-overlay {
+        transform: translateY(0);
+      }
+
+      .portfolio-overlay h3 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .portfolio-overlay p {
+        color: var(--accent-white);
+        font-size: 0.9rem;
+      }
+
+      /* ===== ABOUT SECTION ===== */
+      .about {
+        padding: var(--section-padding);
+        background: var(--secondary-black);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4rem;
+        align-items: center;
+      }
+
+      .about-content {
+        flex: 1;
+        min-width: 300px;
+      }
+
+      .about-image {
+        background-image: url("Resources/Site_Images/About_Image/1.jpg");
+        background-size: cover;
+        background-position: center;
+        flex: 1;
+        min-width: 300px;
+        height: 500px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .about-image::before {
+        content: "";
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        bottom: 20px;
+        border: 2px solid var(--primary-white);
+        z-index: 1;
+      }
+
+      /* ===== FREE MODEL SECTION ===== */
+      .freeModel {
+        padding: var(--section-padding);
+        background: var(--secondary-black);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4rem;
+        align-items: center;
+      }
+
+      .freeModel-content {
+        flex: 1;
+        min-width: 300px;
+      }
+
+      .freeModel-carousel {
+        flex: 1;
+        min-width: 300px;
+        height: 500px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .carousel-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      .carousel-slides {
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
+
+      .carousel-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      .carousel-slide.active {
+        opacity: 1;
+      }
+
+      .carousel-slide::before {
+        content: "";
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        bottom: 20px;
+        border: 2px solid var(--primary-white);
+        z-index: 1;
+      }
+
+      .carousel-prev,
+      .carousel-next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        border: none;
+        padding: 1rem;
+        padding-top: 1.5rem;
+        cursor: pointer;
+        z-index: 10;
+        font-size: 1.5rem;
+        transition: background 0.3s ease;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .carousel-prev:hover,
+      .carousel-next:hover {
+        background: rgba(0, 0, 0, 0.9);
+      }
+
+      .carousel-prev {
+        left: 30px;
+      }
+
+      .carousel-next {
+        right: 30px;
+      }
+
+      .carousel-dots {
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        z-index: 10;
+      }
+
+      .carousel-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.3s ease;
+      }
+
+      .carousel-dot.active {
+        background: white;
+        transform: scale(1.2);
+      }
+
+      .freeModel-button {
+        width: 100%;
+        justify-content: center;
+        display: flex;
+        padding: 25px 0;
+      }
+
+      /* ===== SERVICES SECTION ===== */
+      .services {
+        padding: var(--section-padding);
+      }
+
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 2rem;
+      }
+
+      .service-card {
+        padding: 2rem;
+        background: var(--secondary-black);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: var(--transition);
+      }
+
+      .service-card:hover {
+        border-color: var(--primary-white);
+      }
+
+      .service-card i {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .service-card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+      }
+
+      /* ===== FOOTER ===== */
+      footer {
+        background: var(--secondary-black);
+        padding: 4rem 5% 2rem;
+        text-align: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .footer-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .social-icons {
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 1rem;
+      }
+
+      .social-icons a {
+        color: var(--primary-white);
+        font-size: 1.5rem;
+        transition: var(--transition);
+      }
+
+      .social-icons a:hover {
+        opacity: 0.7;
+      }
+
+      .copyright {
+        color: var(--accent-white);
+        font-size: 0.9rem;
+      }
+
+      /* ===== HERO GALLERY ===== */
+      .hero-gallery {
+        flex: 1;
+        min-width: 300px;
+        max-width: 500px;
+        min-height: 65vh;
+        padding: 20px;
+        position: relative;
+      }
+
+      .gallery-title {
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        padding-bottom: 10px;
+      }
+
+      .gallery-title::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: var(--primary-white);
+      }
+
+      .swiper-container {
+        width: 100%;
+        height: 380px;
+        padding: 20px 0 40px;
+      }
+
+      .swiper-slide {
+        background-position: center;
+        background-size: cover;
+        width: 350px;
+        height: 350px;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .swiper-slide::before {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        right: 15px;
+        bottom: 15px;
+        z-index: 1;
+        opacity: 0;
+        transition: var(--transition);
+        border-radius: 8px;
+      }
+
+      .swiper-slide-active {
+        transform: scale(1.05);
+        z-index: 10;
+        border-color: var(--primary-white);
+      }
+
+      .swiper-slide-active::before {
+        opacity: 1;
+      }
+
+      .swiper-slide img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* ===== RESPONSIVE DESIGN ===== */
+
+      @media (max-width: 1200px) {
+        .hero {
+          flex-direction: column;
+        }
+
+        .hero-content {
+          text-align: start;
+        }
+      }
+
+      @media (max-width: 900px) {
+        :root {
+          --section-padding: 4rem 5%;
+        }
+
+        nav ul {
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          width: 100%;
+          background: var(--primary-black);
+          flex-direction: column;
+          padding: 2rem;
+          gap: 1.5rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        nav ul.active {
+          display: flex;
+        }
+
+        .menu-toggle {
+          display: block;
+        }
+
+        .hero {
+          gap: 3rem;
+          text-align: center;
+        }
+
+        .hero-content,
+        .hero-gallery {
+          max-width: 100%;
+        }
+
+        .hero-gallery {
+          order: 2;
+        }
+
+        .hero-content {
+          order: 1;
+        }
+
+        .about,
+        .freeModel {
+          gap: 2rem;
+        }
+
+        .swiper-container {
+          height: 350px;
+        }
+        .portfolio {
+          margin-top: 8rem;
+        }
+      }
+
+      @media (max-width: 600px) {
+        :root {
+          --section-padding: 3rem 5%;
+        }
+
+        .logo {
+          width: 60px;
+          height: 60px;
+          font-size: 16px;
+        }
+
+        .logo-text {
+          font-size: 1.5rem;
+        }
+
+        .portfolio-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .about-image,
+        .freeModel-carousel {
+          height: 400px;
+        }
+
+        .swiper-container {
+          height: 320px;
+          padding-bottom: 30px;
+        }
+
+        .service-card {
+          padding: 1.5rem;
+        }
+      }
+
+      @media (max-width: 400px) {
+        .swiper-container {
+          height: 280px;
+        }
+
+        .hero-gallery {
+          padding: 10px;
+          overflow: hidden;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header with navigation -->
+    <header>
+      <div
+        class="logo-container"
+        onclick="window.location.href='index.html'"
+        style="cursor: pointer"
+      >
+        <div class="logo">
+          <img src="./Resources/Logo/Logo Round.png" style="width: 100%" />
+        </div>
+        <div class="logo-text">Chibi Flex</div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </nav>
+      <div class="menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+    </header>
+
+    <!-- Hero section -->
+    <section
+      class="hero"
+      id="home"
+      style="display: flex; justify-content: space-evenly"
+    >
+      <div class="hero-content">
+        <h1>WELCOME TO THE CHIBI FLEX FAMILY!</h1>
+        <p>
+          <strong>Looking for fresh 3D print-ready designs?</strong><br />Don't
+          miss out — join our growing community of makers today and unlock
+          exclusive models you simply can't get anywhere else!
+        </p>
+        <p style="margin-bottom: 3px; margin-left: 40px">
+          <strong>&bull; 7+ new models every month</strong> exclusive models
+          included
+        </p>
+        <p style="margin-bottom: 3px; margin-left: 40px">
+          <strong>&bull; Instant access to the patreon welcome pack</strong>
+        </p>
+        <p style="margin-bottom: 3px; margin-left: 40px">
+          <strong>&bull; Sell your prints legally</strong> (commercial tiers)
+        </p>
+        <p style="margin-bottom: 3px; margin-left: 40px">
+          <strong>&bull; 50% off for every past design.</strong>
+        </p>
+        <p style="margin-bottom: 3px; margin-left: 40px">
+          <strong>&bull; You decide what we create next.</strong>
+        </p>
+        <p style="margin-bottom: 3px; margin-left: 40px">
+          <strong>&bull; $6/month commercial license tier</strong> Limited spots
+          available.
+        </p>
+        <div
+          style="
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          "
+        >
+          <a
+            target="_blank"
+            style="margin-top: 50px; cursor: pointer"
+            href="https://www.patreon.com/ChibiFlex/membership"
+            class="btn"
+            >Join Now</a
+          >
+        </div>
+      </div>
+
+      <!-- This Month's Releases Gallery -->
+      <div class="hero-gallery">
+        <h3 class="gallery-title">September Releases</h3>
+        <div class="swiper-container">
+          <div class="swiper-wrapper">
+            <!-- Slides will be dynamically added here -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Portfolio section -->
+    <section class="portfolio" id="portfolio">
+      <h2 class="section-title">All Public Releases</h2>
+      <p style="margin-bottom: 2.5rem; font-size: 18px">
+        Discover every model we've made available to the public right here
+      </p>
+      <div class="portfolio-grid" id="public-releases-grid">
+        <!-- Cards will be dynamically generated here -->
+      </div>
+
+      <h2 class="section-title" style="margin-top: 10rem">
+        Patreon Welcome Pack
+      </h2>
+      <p style="margin-bottom: 2.5rem; font-size: 18px">
+        Here’s a peek at the full set of designs you’ll receive as your welcome
+        pack when you join!
+      </p>
+      <div class="portfolio-grid" id="welcome-pack-grid">
+        <!-- Cards will be dynamically generated here -->
+      </div>
+
+      <h2 class="section-title" style="margin-top: 10rem">Exclusive Designs</h2>
+      <p style="margin-bottom: 2.5rem; font-size: 18px">
+        A look back at our retired Patreon exclusives! Each of these models was
+        released for members only and will never be available to the public
+        again.
+      </p>
+      <div class="portfolio-grid" id="old-exclusives-grid">
+        <!-- Cards will be dynamically generated here -->
+      </div>
+    </section>
+
+    <!-- Free Models section with carousel -->
+    <section class="freeModel" id="freeModel">
+      <div class="freeModel-carousel">
+        <div class="carousel-container">
+          <div class="carousel-slides">
+            <!-- Images will be dynamically loaded here -->
+          </div>
+          <button class="carousel-prev" style="padding-bottom: 25px">
+            &lt;
+          </button>
+          <button class="carousel-next" style="padding-bottom: 25px">
+            &gt;
+          </button>
+          <div class="carousel-dots"></div>
+        </div>
+      </div>
+      <div class="freeModel-content">
+        <h2 class="section-title">Free Models</h2>
+        <p>
+          <strong>Not sure about joining Patreon yet?</strong><br />
+          That's totally fine — grab our <strong> free STL designs</strong> and
+          give it a try first! <br /><br />
+          Print it. Flex it. Fall in love with it. 💚 <br />And if you do…
+          there's a whole world of exclusive models waiting for you on Patreon.
+        </p>
+        <div class="freeModel-button">
+          <a
+            href="https://makerworld.com/en/@ChibiFlex"
+            target="_blank"
+            class="btn"
+            >Download Now</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- About section -->
+    <section class="about" id="about">
+      <div class="about-content">
+        <h2 class="section-title">About Chibi Flex</h2>
+        <p>
+          With over 10 years of experience in the cute toy industry for
+          children, Chibi Flex is dedicated to creating adorable, flexible toys
+          that spark joy and imagination. Inspired by the magic of 3D printing,
+          we bring our creative ideas to life with ease and precision,
+          delivering playful companions that both kids and collectors will
+          cherish.
+        </p>
+        <br />
+        <p>
+          We warmly invite you to join us on this exciting journey and be part
+          of the Chibi Flex family!
+        </p>
+      </div>
+      <div class="about-image"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+      <div class="footer-content">
+        <h2 class="logo-text" style="margin-bottom: 1.5rem">Follow us on</h2>
+        <div class="social-icons">
+          <a href="https://www.patreon.com/ChibiFlex" target="_blank"
+            ><i class="fab fa-patreon"></i
+          ></a>
+          <a href="https://www.instagram.com/chibiflex" target="_blank"
+            ><i class="fab fa-instagram"></i
+          ></a>
+          <a href="https://www.facebook.com/chibiflex" target="_blank"
+            ><i class="fab fa-facebook"></i
+          ></a>
+          <a href="https://www.tiktok.com/@chibiflex" target="_blank"
+            ><i class="fab fa-tiktok"></i
+          ></a>
+          <a href="https://www.youtube.com/@Chibiflex" target="_blank"
+            ><i class="fab fa-youtube"></i
+          ></a>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 Chibi Flex. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      // Mobile menu toggle
+      document
+        .querySelector(".menu-toggle")
+        .addEventListener("click", function () {
+          document.querySelector("nav ul").classList.toggle("active");
+        });
+
+      // Close menu when clicking on a link
+      document.querySelectorAll("nav ul li a").forEach((link) => {
+        link.addEventListener("click", () => {
+          document.querySelector("nav ul").classList.remove("active");
+        });
+      });
+
+      // Header background on scroll
+      window.addEventListener("scroll", function () {
+        const header = document.querySelector("header");
+        if (window.scrollY > 100) {
+          header.style.background = "rgba(10, 10, 10, 0.98)";
+        } else {
+          header.style.background = "rgba(10, 10, 10, 0.95)";
+        }
+      });
+    </script>
+  </body>
+</html>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Array of image paths from your This_Months_Release folder
+    const monthlyReleases = [
+      // "Resources/This_Months_Release/10.jpg",
+      //"Resources/This_Months_Release/9.jpg",
+      //"Resources/This_Months_Release/8.jpg",
+      //"Resources/This_Months_Release/7.jpg",
+      //"Resources/This_Months_Release/6.jpg",
+      //"Resources/This_Months_Release/5.jpg",
+      //"Resources/This_Months_Release/4.jpg",
+      "Resources/This_Months_Release/3.jpg",
+      "Resources/This_Months_Release/2.jpg",
+      "Resources/This_Months_Release/1.jpg",
+      // Add more images if needed
+    ];
+
+    const swiperWrapper = document.querySelector(".swiper-wrapper");
+
+    // Create slides for each image
+    monthlyReleases.forEach((imagePath) => {
+      const slide = document.createElement("div");
+      slide.className = "swiper-slide";
+      slide.style.backgroundImage = `url(${imagePath})`;
+      swiperWrapper.appendChild(slide);
+    });
+
+    // Initialize Swiper with cards effect
+    const swiper = new Swiper(".swiper-container", {
+      effect: "cards",
+      grabCursor: true,
+      centeredSlides: true,
+      slidesPerView: "auto",
+      loop: true,
+      autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+      },
+      cardsEffect: {
+        perSlideOffset: 10, // Space between cards
+        perSlideRotate: 2, // Rotation angle
+        slideShadows: false, // Disable shadows for cleaner look
+      },
+      breakpoints: {
+        // Adjust for different screen sizes
+        320: {
+          cardsEffect: {
+            perSlideOffset: 8,
+            perSlideRotate: 1,
+          },
+        },
+        768: {
+          cardsEffect: {
+            perSlideOffset: 10,
+            perSlideRotate: 2,
+          },
+        },
+        1024: {
+          cardsEffect: {
+            perSlideOffset: 12,
+            perSlideRotate: 2,
+          },
+        },
+      },
+    });
+  });
+
+  // Header background on scroll
+  window.addEventListener("scroll", function () {
+    const header = document.querySelector("header");
+    if (window.scrollY > 100) {
+      header.style.background = "rgba(10, 10, 10, 0.98)";
+    } else {
+      header.style.background = "rgba(10, 10, 10, 0.95)";
+    }
+  });
+
+  // Logo click handler
+  document
+    .querySelector(".logo-container")
+    .addEventListener("click", function () {
+      window.location.href = "index.html";
+    });
+
+  // Carousel functionality
+  document.addEventListener("DOMContentLoaded", function () {
+    // Array of image paths - replace with your actual image paths
+    const imagePaths = [
+      // "Resources/Free_Models/20.jpg",
+      // "Resources/Free_Models/19.jpg",
+      // "Resources/Free_Models/18.jpg",
+      // "Resources/Free_Models/17.jpg",
+      // "Resources/Free_Models/16.jpg",
+      // "Resources/Free_Models/15.jpg",
+      // "Resources/Free_Models/14.jpg",
+      // "Resources/Free_Models/13.jpg",
+      // "Resources/Free_Models/12.jpg",
+      // "Resources/Free_Models/11.jpg",
+      // "Resources/Free_Models/10.jpg",
+      // "Resources/Free_Models/9.jpg",
+      // "Resources/Free_Models/8.jpg",
+      // "Resources/Free_Models/7.jpg",
+      // "Resources/Free_Models/6.jpg",
+      // "Resources/Free_Models/5.jpg",
+      "Resources/Free_Models/4.jpg",
+      "Resources/Free_Models/3.jpg",
+      "Resources/Free_Models/2.jpg",
+      "Resources/Free_Models/1.jpg",
+      // Add all your image paths here
+    ];
+
+    const carouselSlides = document.querySelector(".carousel-slides");
+    const carouselDots = document.querySelector(".carousel-dots");
+    let currentSlide = 0;
+    let slideInterval;
+
+    // Create slides and dots
+    imagePaths.forEach((path, index) => {
+      // Create slide
+      const slide = document.createElement("div");
+      slide.className = "carousel-slide";
+      slide.style.backgroundImage = `url(${path})`;
+      if (index === 0) slide.classList.add("active");
+      carouselSlides.appendChild(slide);
+
+      // Create dot
+      const dot = document.createElement("div");
+      dot.className = "carousel-dot";
+      if (index === 0) dot.classList.add("active");
+      dot.addEventListener("click", () => {
+        goToSlide(index);
+      });
+      carouselDots.appendChild(dot);
+    });
+
+    // Navigation functions
+    function goToSlide(index) {
+      // Reset timer
+      clearInterval(slideInterval);
+      startSlideTimer();
+
+      document.querySelectorAll(".carousel-slide").forEach((slide, i) => {
+        slide.classList.toggle("active", i === index);
+      });
+
+      document.querySelectorAll(".carousel-dot").forEach((dot, i) => {
+        dot.classList.toggle("active", i === index);
+      });
+
+      currentSlide = index;
+    }
+
+    function nextSlide() {
+      const next = (currentSlide + 1) % imagePaths.length;
+      goToSlide(next);
+    }
+
+    function prevSlide() {
+      const prev = (currentSlide - 1 + imagePaths.length) % imagePaths.length;
+      goToSlide(prev);
+    }
+
+    function startSlideTimer() {
+      slideInterval = setInterval(nextSlide, 5000);
+    }
+
+    // Set up navigation
+    document
+      .querySelector(".carousel-next")
+      .addEventListener("click", nextSlide);
+    document
+      .querySelector(".carousel-prev")
+      .addEventListener("click", prevSlide);
+
+    // Start the auto-advance
+    startSlideTimer();
+
+    // Pause on hover
+    carouselSlides.addEventListener("mouseenter", () => {
+      clearInterval(slideInterval);
+    });
+
+    carouselSlides.addEventListener("mouseleave", () => {
+      startSlideTimer();
+    });
+
+    // Keyboard navigation
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") prevSlide();
+      if (e.key === "ArrowRight") nextSlide();
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Array of image paths from your Welcome_Pack folder
+    const welcomePackImages = [
+      // "Resources/Welcome_Pack/20.jpg",
+      // "Resources/Welcome_Pack/19.jpg",
+      // "Resources/Welcome_Pack/18.jpg",
+      // "Resources/Welcome_Pack/17.jpg",
+      // "Resources/Welcome_Pack/16.jpg",
+      // "Resources/Welcome_Pack/15.jpg",
+      // "Resources/Welcome_Pack/14.jpg",
+      // "Resources/Welcome_Pack/13.jpg",
+      // "Resources/Welcome_Pack/12.jpg",
+      // "Resources/Welcome_Pack/11.jpg",
+      "Resources/Welcome_Pack/10.jpg",
+      "Resources/Welcome_Pack/9.jpg",
+      "Resources/Welcome_Pack/8.jpg",
+      "Resources/Welcome_Pack/7.jpg",
+      "Resources/Welcome_Pack/6.jpg",
+      "Resources/Welcome_Pack/5.jpg",
+      "Resources/Welcome_Pack/4.jpg",
+      "Resources/Welcome_Pack/3.jpg",
+      "Resources/Welcome_Pack/2.jpg",
+      "Resources/Welcome_Pack/1.jpg",
+      // Add all your image paths here
+    ];
+
+    const portfolioGrid = document.getElementById("welcome-pack-grid");
+
+    // Create portfolio items for each image
+    welcomePackImages.forEach((imagePath, index) => {
+      const portfolioItem = document.createElement("div");
+      portfolioItem.className = "portfolio-item";
+
+      const portfolioImg = document.createElement("div");
+      portfolioImg.className = "portfolio-img";
+      portfolioImg.style.backgroundImage = `url(${imagePath})`;
+      portfolioImg.style.backgroundColor = "#333"; // Fallback color
+
+      portfolioItem.appendChild(portfolioImg);
+
+      portfolioGrid.appendChild(portfolioItem);
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Array of image paths from your Subscriber_Exclusives folder
+    const oldExclusivesImages = [
+      // 'Resources/Subscriber_Exclusives/20.jpg',
+      // 'Resources/Subscriber_Exclusives/19.jpg',
+      // 'Resources/Subscriber_Exclusives/18.jpg',
+      // 'Resources/Subscriber_Exclusives/17.jpg',
+      // 'Resources/Subscriber_Exclusives/16.jpg',
+      // 'Resources/Subscriber_Exclusives/15.jpg',
+      // 'Resources/Subscriber_Exclusives/14.jpg',
+      // 'Resources/Subscriber_Exclusives/13.jpg',
+      // 'Resources/Subscriber_Exclusives/12.jpg',
+      // 'Resources/Subscriber_Exclusives/11.jpg',
+      // 'Resources/Subscriber_Exclusives/10.jpg',
+      // 'Resources/Subscriber_Exclusives/9.jpg',
+      // 'Resources/Subscriber_Exclusives/8.jpg',
+      'Resources/Subscriber_Exclusives/7.jpg',
+      'Resources/Subscriber_Exclusives/6.jpg',
+      "Resources/Subscriber_Exclusives/5.jpg",
+      "Resources/Subscriber_Exclusives/4.jpg",
+      "Resources/Subscriber_Exclusives/3.jpg",
+      "Resources/Subscriber_Exclusives/2.jpg",
+      "Resources/Subscriber_Exclusives/1.jpg",
+      // Add all your image paths here
+    ];
+
+    const portfolioGrid = document.getElementById("old-exclusives-grid");
+
+    // Create portfolio items for each image
+    oldExclusivesImages.forEach((imagePath, index) => {
+      const portfolioItem = document.createElement("div");
+      portfolioItem.className = "portfolio-item";
+
+      const portfolioImg = document.createElement("div");
+      portfolioImg.className = "portfolio-img";
+      portfolioImg.style.backgroundImage = `url(${imagePath})`;
+      portfolioImg.style.backgroundColor = "#333"; // Fallback color
+
+      portfolioItem.appendChild(portfolioImg);
+
+      portfolioGrid.appendChild(portfolioItem);
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Array of image paths from your Public_Releases folder
+    const publicReleasesImages = [
+      // "Resources/Public_Releases/100.jpg",
+      // "Resources/Public_Releases/99.jpg",
+      // "Resources/Public_Releases/98.jpg",
+      // "Resources/Public_Releases/97.jpg",
+      // "Resources/Public_Releases/96.jpg",
+      // "Resources/Public_Releases/95.jpg",
+      // "Resources/Public_Releases/94.jpg",
+      // "Resources/Public_Releases/93.jpg",
+      // "Resources/Public_Releases/92.jpg",
+      // "Resources/Public_Releases/91.jpg",
+      // "Resources/Public_Releases/90.jpg",
+      // "Resources/Public_Releases/89.jpg",
+      // "Resources/Public_Releases/88.jpg",
+      // "Resources/Public_Releases/87.jpg",
+      // "Resources/Public_Releases/86.jpg",
+      // "Resources/Public_Releases/85.jpg",
+      // "Resources/Public_Releases/84.jpg",
+      // "Resources/Public_Releases/83.jpg",
+      // "Resources/Public_Releases/82.jpg",
+      // "Resources/Public_Releases/81.jpg",
+      // "Resources/Public_Releases/80.jpg",
+      // "Resources/Public_Releases/79.jpg",
+      // "Resources/Public_Releases/78.jpg",
+      // "Resources/Public_Releases/77.jpg",
+      // "Resources/Public_Releases/76.jpg",
+      // "Resources/Public_Releases/75.jpg",
+      // "Resources/Public_Releases/74.jpg",
+      // "Resources/Public_Releases/73.jpg",
+      // "Resources/Public_Releases/72.jpg",
+      // "Resources/Public_Releases/71.jpg",
+      // "Resources/Public_Releases/70.jpg",
+      // "Resources/Public_Releases/69.jpg",
+      // "Resources/Public_Releases/68.jpg",
+      // "Resources/Public_Releases/67.jpg",
+      // "Resources/Public_Releases/66.jpg",
+      // "Resources/Public_Releases/65.jpg",
+      // "Resources/Public_Releases/64.jpg",
+      // "Resources/Public_Releases/63.jpg",
+      // "Resources/Public_Releases/62.jpg",
+      // "Resources/Public_Releases/61.jpg",
+      // "Resources/Public_Releases/60.jpg",
+      // "Resources/Public_Releases/59.jpg",
+      // "Resources/Public_Releases/58.jpg",
+      // "Resources/Public_Releases/57.jpg",
+      // "Resources/Public_Releases/56.jpg",
+      // "Resources/Public_Releases/55.jpg",
+      // "Resources/Public_Releases/54.jpg",
+      // "Resources/Public_Releases/53.jpg",
+      // "Resources/Public_Releases/52.jpg",
+      // "Resources/Public_Releases/51.jpg",
+      // "Resources/Public_Releases/50.jpg",
+      // "Resources/Public_Releases/49.jpg",
+      // "Resources/Public_Releases/48.jpg",
+      // "Resources/Public_Releases/47.jpg",
+      // "Resources/Public_Releases/46.jpg",
+      // "Resources/Public_Releases/45.jpg",
+      // "Resources/Public_Releases/44.jpg",
+      // "Resources/Public_Releases/43.jpg",
+      // "Resources/Public_Releases/42.jpg",
+      // "Resources/Public_Releases/41.jpg",
+      // "Resources/Public_Releases/40.jpg",
+      // "Resources/Public_Releases/39.jpg",
+      // "Resources/Public_Releases/38.jpg",
+      // "Resources/Public_Releases/37.jpg",
+      // "Resources/Public_Releases/36.jpg",
+      // "Resources/Public_Releases/35.jpg",
+      // "Resources/Public_Releases/34.jpg",
+      // "Resources/Public_Releases/33.jpg",
+      // "Resources/Public_Releases/32.jpg",
+      // "Resources/Public_Releases/31.jpg",
+      // "Resources/Public_Releases/30.jpg",
+      // "Resources/Public_Releases/29.jpg",
+      // "Resources/Public_Releases/28.jpg",
+      // "Resources/Public_Releases/27.jpg",
+      // "Resources/Public_Releases/26.jpg",
+      // "Resources/Public_Releases/25.jpg",
+      // "Resources/Public_Releases/24.jpg",
+      // "Resources/Public_Releases/23.jpg",
+      // "Resources/Public_Releases/22.jpg",
+      // "Resources/Public_Releases/21.jpg",
+      "Resources/Public_Releases/20.jpg",
+      "Resources/Public_Releases/19.jpg",
+      "Resources/Public_Releases/18.jpg",
+      "Resources/Public_Releases/17.jpg",
+      "Resources/Public_Releases/16.jpg",
+      "Resources/Public_Releases/15.jpg",
+      "Resources/Public_Releases/14.jpg",
+      "Resources/Public_Releases/13.jpg",
+      "Resources/Public_Releases/12.jpg",
+      "Resources/Public_Releases/11.jpg",
+      "Resources/Public_Releases/10.jpg",
+      "Resources/Public_Releases/9.jpg",
+      "Resources/Public_Releases/8.jpg",
+      "Resources/Public_Releases/7.jpg",
+      "Resources/Public_Releases/6.jpg",
+      "Resources/Public_Releases/5.jpg",
+      "Resources/Public_Releases/4.jpg",
+      "Resources/Public_Releases/3.jpg",
+      "Resources/Public_Releases/2.jpg",
+      "Resources/Public_Releases/1.jpg",
+    ];
+
+    const portfolioGrid = document.getElementById("public-releases-grid");
+
+    // Create portfolio items for each image
+    publicReleasesImages.forEach((imagePath, index) => {
+      const portfolioItem = document.createElement("div");
+      portfolioItem.className = "portfolio-item";
+
+      const portfolioImg = document.createElement("div");
+      portfolioImg.className = "portfolio-img";
+      portfolioImg.style.backgroundImage = `url(${imagePath})`;
+      portfolioImg.style.backgroundColor = "#333"; // Fallback color
+
+      portfolioItem.appendChild(portfolioImg);
+
+      portfolioGrid.appendChild(portfolioItem);
+    });
+  });
+</script>
