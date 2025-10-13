@@ -11,7 +11,7 @@
       property="og:title"
       content="Chibi Flex – Cute 3D Printable Flexi Models & Articulated Design"
     />
-    <meta name="robots" content="noindex">
+    <meta name="robots" content="noindex" />
     <meta
       property="og:description"
       content="Discover adorable 3D printable flexi models designed for makers of all ages. Fun, fidget-friendly articulated designs – only at Chibiflex."
@@ -964,43 +964,46 @@
       swiperWrapper.appendChild(slide);
     });
 
-    // Initialize Swiper with cards effect
-    const swiper = new Swiper(".swiper-container", {
-      effect: "cards",
-      grabCursor: true,
-      centeredSlides: true,
-      slidesPerView: "auto",
-      loop: true,
-      autoplay: {
-        delay: 3000,
-        disableOnInteraction: false,
-      },
-      cardsEffect: {
-        perSlideOffset: 10, // Space between cards
-        perSlideRotate: 2, // Rotation angle
-        slideShadows: false, // Disable shadows for cleaner look
-      },
-      breakpoints: {
-        // Adjust for different screen sizes
-        320: {
-          cardsEffect: {
-            perSlideOffset: 8,
-            perSlideRotate: 1,
+    document.addEventListener("DOMContentLoaded", function () {
+      const slides = document.querySelectorAll(
+        ".swiper-container .swiper-slide"
+      );
+      const swiper = new Swiper(".swiper-container", {
+        effect: "cards",
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: "auto",
+        loop: slides.length > 1, // Only loop if more than 1 slide
+        autoplay: {
+          delay: 3000,
+          disableOnInteraction: false,
+        },
+        cardsEffect: {
+          perSlideOffset: 10,
+          perSlideRotate: 2,
+          slideShadows: false,
+        },
+        breakpoints: {
+          320: {
+            cardsEffect: {
+              perSlideOffset: 8,
+              perSlideRotate: 1,
+            },
+          },
+          768: {
+            cardsEffect: {
+              perSlideOffset: 10,
+              perSlideRotate: 2,
+            },
+          },
+          1024: {
+            cardsEffect: {
+              perSlideOffset: 12,
+              perSlideRotate: 2,
+            },
           },
         },
-        768: {
-          cardsEffect: {
-            perSlideOffset: 10,
-            perSlideRotate: 2,
-          },
-        },
-        1024: {
-          cardsEffect: {
-            perSlideOffset: 12,
-            perSlideRotate: 2,
-          },
-        },
-      },
+      });
     });
   });
 
@@ -1190,8 +1193,8 @@
       // 'Resources/Subscriber_Exclusives/10.jpg',
       // 'Resources/Subscriber_Exclusives/9.jpg',
       // 'Resources/Subscriber_Exclusives/8.jpg',
-      'Resources/Subscriber_Exclusives/7.jpg',
-      'Resources/Subscriber_Exclusives/6.jpg',
+      "Resources/Subscriber_Exclusives/7.jpg",
+      "Resources/Subscriber_Exclusives/6.jpg",
       "Resources/Subscriber_Exclusives/5.jpg",
       "Resources/Subscriber_Exclusives/4.jpg",
       "Resources/Subscriber_Exclusives/3.jpg",
