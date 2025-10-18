@@ -11,7 +11,7 @@
       property="og:title"
       content="Chibi Flex – Cute 3D Printable Flexi Models & Articulated Design"
     />
-   <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow" />
     <meta
       property="og:description"
       content="Discover adorable 3D printable flexi models designed for makers of all ages. Fun, fidget-friendly articulated designs – only at Chibiflex."
@@ -677,9 +677,15 @@
         }
 
         .portfolio-grid {
-          grid-template-columns: 1fr;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
         }
 
+        /* Make portfolio items smaller on mobile */
+        .portfolio-item {
+          aspect-ratio: 1 / 1;
+          min-height: 0;
+        }
         .about-image,
         .freeModel-carousel {
           height: 400px;
@@ -704,9 +710,14 @@
           padding: 10px;
           overflow: hidden;
         }
+
+        /* Further adjustments for very small screens */
+        .portfolio-grid {
+          gap: 0.75rem;
+        }
       }
     </style>
-    
+
     <!-- Meta Pixel Code -->
     <script>
       !(function (f, b, e, v, n, t, s) {
@@ -743,7 +754,6 @@
         src="https://www.facebook.com/tr?id=841896405070204&ev=PageView&noscript=1"
     /></noscript>
     <!-- End Meta Pixel Code -->
-
   </head>
   <body>
     <!-- Header with navigation -->
