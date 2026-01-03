@@ -768,7 +768,11 @@
         style="cursor: pointer"
       >
         <div class="logo">
-          <img src="./Resources/Logo/Logo Round.png" style="width: 100%" loading="lazy"/>
+          <img
+            src="./Resources/Logo/Logo Round.png"
+            style="width: 100%"
+            loading="lazy"
+          />
         </div>
         <div class="logo-text">Chibi Flex</div>
       </div>
@@ -1217,7 +1221,16 @@
 
       const portfolioImg = document.createElement("div");
       portfolioImg.className = "portfolio-img";
-      portfolioImg.style.backgroundImage = `url(${imagePath})`;
+      const img = document.createElement("img");
+      img.src = imagePath;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.style.width = "100%";
+      img.style.height = "100%";
+      img.style.objectFit = "cover";
+
+      portfolioItem.appendChild(img);
+
       portfolioImg.style.backgroundColor = "#333"; // Fallback color
 
       portfolioItem.appendChild(portfolioImg);
@@ -1239,9 +1252,9 @@
       // 'Resources/Subscriber_Exclusives/13.webp',
       // 'Resources/Subscriber_Exclusives/12.webp',
       // 'Resources/Subscriber_Exclusives/11.webp',
-      'Resources/Subscriber_Exclusives/10.webp',
-      'Resources/Subscriber_Exclusives/9.webp',
-      'Resources/Subscriber_Exclusives/8.webp',
+      "Resources/Subscriber_Exclusives/10.webp",
+      "Resources/Subscriber_Exclusives/9.webp",
+      "Resources/Subscriber_Exclusives/8.webp",
       "Resources/Subscriber_Exclusives/7.webp",
       "Resources/Subscriber_Exclusives/6.webp",
       "Resources/Subscriber_Exclusives/5.webp",
@@ -1261,7 +1274,16 @@
 
       const portfolioImg = document.createElement("div");
       portfolioImg.className = "portfolio-img";
-      portfolioImg.style.backgroundImage = `url(${imagePath})`;
+      const img = document.createElement("img");
+      img.src = imagePath;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.style.width = "100%";
+      img.style.height = "100%";
+      img.style.objectFit = "cover";
+
+      portfolioItem.appendChild(img);
+
       portfolioImg.style.backgroundColor = "#333"; // Fallback color
 
       portfolioItem.appendChild(portfolioImg);
@@ -1384,7 +1406,16 @@
 
       const portfolioImg = document.createElement("div");
       portfolioImg.className = "portfolio-img";
-      portfolioImg.style.backgroundImage = `url(${imagePath})`;
+      const img = document.createElement("img");
+      img.src = imagePath;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.style.width = "100%";
+      img.style.height = "100%";
+      img.style.objectFit = "cover";
+
+      portfolioItem.appendChild(img);
+
       portfolioImg.style.backgroundColor = "#333"; // Fallback color
 
       portfolioItem.appendChild(portfolioImg);
