@@ -994,6 +994,22 @@
   </body>
 </html>
 <script>
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.src = entry.target.dataset.src;
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { rootMargin: "200px" }
+  );
+
+  img.dataset.src = imagePath;
+  img.src = "placeholder.webp";
+  observer.observe(img);
+
   document.addEventListener("DOMContentLoaded", function () {
     // Array of image paths from your This_Months_Release folder
     const monthlyReleases = [
