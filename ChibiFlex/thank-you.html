@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Thank you for subscribing to ChibiFlex! Download your free 3D printable articulated STL models."
+    />
+    <meta property="og:title" content="Thank You! – Chibi Flex Free 3D Models" />
+    <meta property="og:image" content="Resources/Logo/Logo Round.webp" />
+    <title>Thank You! – Chibi Flex Free 3D Models Unlocked 💚</title>
+    <link rel="icon" type="image/webp" href="Resources/Logo/Logo Round.webp" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --bg-main: #0b0c10;
+        --bg-secondary: #12141c;
+        --bg-card: rgba(18, 20, 30, 0.7);
+        --bg-card-hover: rgba(28, 32, 48, 0.85);
+        --border-subtle: rgba(255, 255, 255, 0.08);
+        --border-light: rgba(255, 255, 255, 0.16);
+        --border-glow: rgba(236, 72, 153, 0.45);
+        
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        
+        --accent-pink: #ec4899;
+        --accent-purple: #a855f7;
+        --accent-cyan: #06b6d4;
+        --accent-emerald: #10b981;
+        
+        --gradient-primary: linear-gradient(135deg, #ec4899 0%, #a855f7 50%, #3b82f6 100%);
+        --gradient-secondary: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+        --gradient-text: linear-gradient(135deg, #ffffff 40%, #f472b6 100%);
+        
+        --radius-sm: 8px;
+        --radius-md: 14px;
+        --radius-lg: 22px;
+        --radius-full: 9999px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--bg-main);
+        color: var(--text-primary);
+        font-family: "Plus Jakarta Sans", sans-serif;
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+      }
+
+      /* Header */
+      header {
+        padding: 1.25rem 5%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(11, 12, 16, 0.85);
+        backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--border-subtle);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+      }
+
+      .logo-img {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 2px solid var(--border-light);
+      }
+
+      .logo-text {
+        font-family: "Outfit", sans-serif;
+        font-size: 1.4rem;
+        font-weight: 800;
+        background: var(--gradient-text);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .home-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        border-radius: var(--radius-full);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border-light);
+        color: var(--text-primary);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .home-btn:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: var(--accent-cyan);
+        transform: translateY(-2px);
+      }
+
+      /* Main Container */
+      .main-content {
+        flex: 1;
+        max-width: 900px;
+        width: 92%;
+        margin: 3rem auto 4rem auto;
+      }
+
+      /* Celebration Hero Card */
+      .celebration-card {
+        background: linear-gradient(145deg, rgba(18, 20, 30, 0.95), rgba(13, 15, 24, 0.9));
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        padding: 3.5rem 2.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 50px rgba(6, 182, 212, 0.15);
+      }
+
+      .celebration-card::before {
+        content: "";
+        position: absolute;
+        top: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 260px;
+        height: 260px;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .check-badge {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(16, 185, 129, 0.15);
+        border: 2px solid var(--accent-emerald);
+        color: var(--accent-emerald);
+        font-size: 2.4rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+        animation: pulseScale 2s infinite ease-in-out;
+      }
+
+      @keyframes pulseScale {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.06); }
+      }
+
+      .page-title {
+        font-family: "Outfit", sans-serif;
+        font-size: 2.6rem;
+        font-weight: 900;
+        margin-bottom: 0.8rem;
+        letter-spacing: -0.5px;
+        background: linear-gradient(135deg, #ffffff 40%, #10b981 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .page-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto 2.2rem auto;
+        line-height: 1.6;
+      }
+
+      /* Google Drive Download Box */
+      .drive-box {
+        background: rgba(6, 182, 212, 0.08);
+        border: 1px solid rgba(6, 182, 212, 0.35);
+        border-radius: var(--radius-md);
+        padding: 2rem;
+        max-width: 640px;
+        margin: 0 auto;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .btn-drive {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        max-width: 440px;
+        padding: 18px 28px;
+        border-radius: var(--radius-full);
+        background: var(--gradient-secondary);
+        color: #ffffff;
+        font-family: "Outfit", sans-serif;
+        font-size: 1.2rem;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 8px 30px rgba(6, 182, 212, 0.5);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .btn-drive:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 12px 35px rgba(6, 182, 212, 0.7);
+      }
+
+      .drive-hint {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 1rem;
+      }
+
+      /* Patreon Card */
+      .patreon-card {
+        margin-top: 3rem;
+        background: linear-gradient(145deg, rgba(236, 72, 153, 0.08), rgba(168, 85, 247, 0.08));
+        border: 1px solid rgba(236, 72, 153, 0.3);
+        border-radius: var(--radius-lg);
+        padding: 2.5rem;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+      }
+
+      .patreon-title {
+        font-family: "Outfit", sans-serif;
+        font-size: 1.7rem;
+        font-weight: 800;
+        margin-bottom: 0.6rem;
+        color: #ffffff;
+      }
+
+      .patreon-desc {
+        color: var(--text-secondary);
+        max-width: 580px;
+        margin: 0 auto 1.8rem auto;
+        font-size: 0.95rem;
+      }
+
+      .perks-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+        margin-bottom: 2rem;
+        text-align: left;
+      }
+
+      .perk-item {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+      }
+
+      .perk-item i {
+        color: var(--accent-pink);
+        font-size: 1.1rem;
+      }
+
+      .btn-patreon {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 32px;
+        border-radius: var(--radius-full);
+        background: var(--gradient-primary);
+        color: #ffffff;
+        font-family: "Outfit", sans-serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 8px 25px rgba(236, 72, 153, 0.45);
+        transition: all 0.3s ease;
+      }
+
+      .btn-patreon:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(236, 72, 153, 0.65);
+      }
+
+      /* Footer */
+      footer {
+        padding: 2rem 5%;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        border-top: 1px solid var(--border-subtle);
+        background: rgba(11, 12, 16, 0.9);
+      }
+
+      @media (max-width: 768px) {
+        .page-title {
+          font-size: 2rem;
+        }
+        .celebration-card {
+          padding: 2.5rem 1.5rem;
+        }
+        .drive-box {
+          padding: 1.5rem 1rem;
+        }
+        .btn-drive {
+          font-size: 1.05rem;
+          padding: 15px 20px;
+        }
+      }
+    </style>
+
+    <!-- Meta Pixel Code -->
+    <script>
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod
+            ? n.callMethod.apply(n, arguments)
+            : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = "2.0";
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(
+        window,
+        document,
+        "script",
+        "https://connect.facebook.net/en_US/fbevents.js"
+      );
+      fbq("init", "1289855809877347");
+      fbq("track", "PageView");
+
+      // Track conversion Lead event on Thank You Page load
+      fbq("track", "Lead", {
+        content_name: "Free Models Download (Thank You Page)",
+        status: "success",
+      });
+    </script>
+    <!-- End Meta Pixel Code -->
+  </head>
+  <body>
+    <!-- Meta Pixel Fallback -->
+    <noscript>
+      <img
+        height="1"
+        width="1"
+        style="display: none"
+        src="https://www.facebook.com/tr?id=1289855809877347&ev=PageView&noscript=1"
+      />
+    </noscript>
+
+    <!-- Header Navigation -->
+    <header>
+      <a href="index.html" class="logo-container">
+        <img
+          src="Resources/Logo/Logo Round.webp"
+          alt="Chibi Flex Logo"
+          class="logo-img"
+        />
+        <span class="logo-text">Chibi Flex</span>
+      </a>
+      <a href="index.html" class="home-btn">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Back to Home</span>
+      </a>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Celebration Hero -->
+      <section class="celebration-card">
+        <div class="check-badge">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h1 class="page-title">You're All Set! 💚</h1>
+        <p class="page-subtitle">
+          Thank you for joining the Chibi Flex family! Your free 3D printable
+          articulated STL files are ready to download:
+        </p>
+
+        <!-- Google Drive Box -->
+        <div class="drive-box">
+          <a
+            id="thank-you-drive-link"
+            href="#"
+            target="_blank"
+            class="btn-drive"
+          >
+            <i class="fa-brands fa-google-drive" style="font-size: 1.4rem;"></i>
+            <span>Open Google Drive Download</span>
+            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.95rem;"></i>
+          </a>
+          <p class="drive-hint">
+            <i class="fa-solid fa-shield-halved"></i> 100% Free Direct Access · Instant STL Downloads · No Wait
+          </p>
+        </div>
+      </section>
+
+      <!-- Patreon Exclusive Upsell -->
+      <section class="patreon-card">
+        <h2 class="patreon-title">Want More Exclusive Flexi Models? 🧸✨</h2>
+        <p class="patreon-desc">
+          Support our creations on Patreon to unlock a huge vault of cute articulated designs, commercial licenses to sell prints, and brand-new drops every month!
+        </p>
+
+        <div class="perks-grid">
+          <div class="perk-item">
+            <i class="fa-solid fa-gift"></i>
+            <span>Instant Welcome Pack (50+ Models)</span>
+          </div>
+          <div class="perk-item">
+            <i class="fa-solid fa-sparkles"></i>
+            <span>4+ New Exclusive Models Monthly</span>
+          </div>
+          <div class="perk-item">
+            <i class="fa-solid fa-briefcase"></i>
+            <span>Commercial License (Sell 3D Prints)</span>
+          </div>
+          <div class="perk-item">
+            <i class="fa-solid fa-check-to-slot"></i>
+            <span>Monthly Community Design Polls</span>
+          </div>
+        </div>
+
+        <a
+          href="https://www.patreon.com/ChibiFlex"
+          target="_blank"
+          class="btn-patreon"
+        >
+          <i class="fa-brands fa-patreon" style="font-size: 1.2rem;"></i>
+          <span>Join ChibiFlex on Patreon</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; <span id="year"></span> Chibi Flex. All rights reserved.</p>
+    </footer>
+
+    <script>
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // Resolve Google Drive Link dynamically
+      async function setupDriveLink() {
+        const linkEl = document.getElementById('thank-you-drive-link');
+        
+        // 1. Check URL parameters (?drive=...)
+        const urlParams = new URLSearchParams(window.location.search);
+        const driveParam = urlParams.get('drive');
+        if (driveParam) {
+          linkEl.href = driveParam;
+          localStorage.setItem('chibiflex_drive_link', driveParam);
+          return;
+        }
+
+        // 2. Check localStorage
+        const savedLink = localStorage.getItem('chibiflex_drive_link');
+        if (savedLink) {
+          linkEl.href = savedLink;
+          return;
+        }
+
+        // 3. Fallback: Fetch directly from server public settings
+        try {
+          const res = await fetch('/api/settings/public');
+          const data = await res.json();
+          // We can fallback to the direct free models endpoint or default
+          if (data && data.googleDriveLink) {
+            linkEl.href = data.googleDriveLink;
+          } else {
+            linkEl.href = 'https://drive.google.com';
+          }
+        } catch (e) {
+          linkEl.href = 'https://drive.google.com';
+        }
+      }
+
+      setupDriveLink();
+    </script>
+  </body>
+</html>

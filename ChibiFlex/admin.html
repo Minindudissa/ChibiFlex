@@ -1,0 +1,3313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChibiFlex — Admin Dashboard</title>
+    <link rel="icon" type="image/webp" href="Resources/Logo/Logo Round.webp" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --bg-main: #0b0c10;
+        --bg-secondary: #12141c;
+        --bg-card: rgba(18, 20, 30, 0.75);
+        --bg-card-hover: rgba(28, 32, 48, 0.9);
+        --border-subtle: rgba(255, 255, 255, 0.08);
+        --border-light: rgba(255, 255, 255, 0.16);
+        --border-glow: rgba(236, 72, 153, 0.5);
+
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+
+        --accent-pink: #ec4899;
+        --accent-purple: #a855f7;
+        --accent-cyan: #06b6d4;
+        --accent-emerald: #10b981;
+        --accent-red: #ef4444;
+
+        --gradient-primary: linear-gradient(135deg, #ec4899 0%, #a855f7 50%, #3b82f6 100%);
+        --gradient-secondary: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+        --radius-sm: 8px;
+        --radius-md: 14px;
+        --radius-lg: 20px;
+        --radius-full: 9999px;
+        --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--bg-main);
+        color: var(--text-primary);
+        font-family: "Plus Jakarta Sans", sans-serif;
+        line-height: 1.6;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        background: 
+          radial-gradient(circle at 10% 15%, rgba(236, 72, 153, 0.08), transparent 40%),
+          radial-gradient(circle at 90% 25%, rgba(168, 85, 247, 0.09), transparent 45%),
+          radial-gradient(circle at 50% 80%, rgba(6, 182, 212, 0.07), transparent 45%);
+      }
+
+      h1, h2, h3, h4, .logo-text {
+        font-family: "Outfit", sans-serif;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #090a0f;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #1e2433;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-pink);
+      }
+
+      /* ===== LOGIN SCREEN ===== */
+      #login-screen {
+        position: fixed;
+        inset: 0;
+        background: rgba(11, 12, 16, 0.95);
+        backdrop-filter: blur(25px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 20px;
+      }
+
+      .login-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        padding: 3rem 2.5rem;
+        max-width: 440px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(236, 72, 153, 0.2);
+        animation: fadeIn 0.4s ease;
+      }
+
+      .login-logo {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        padding: 3px;
+        border: 2px solid var(--accent-pink);
+        box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+      }
+
+      .login-logo img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .login-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+      }
+
+      .login-subtitle {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+      }
+
+      .form-group {
+        text-align: left;
+        margin-bottom: 1.5rem;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .form-input, .form-select, .form-textarea {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-light);
+        color: #ffffff;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        font-family: inherit;
+        font-size: 1rem;
+        transition: var(--transition);
+      }
+
+      .form-input:focus, .form-select:focus, .form-textarea:focus {
+        outline: none;
+        border-color: var(--accent-pink);
+        box-shadow: 0 0 15px rgba(236, 72, 153, 0.3);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .form-select option {
+        background: #12141c;
+        color: #ffffff;
+      }
+
+      .form-textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 24px;
+        font-family: "Outfit", sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        border-radius: var(--radius-full);
+        cursor: pointer;
+        transition: var(--transition);
+        border: none;
+        text-decoration: none;
+      }
+
+      .btn-primary {
+        background: var(--gradient-primary);
+        color: #ffffff;
+        box-shadow: 0 4px 18px rgba(236, 72, 153, 0.4);
+        width: 100%;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(236, 72, 153, 0.6);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+        border: 1px solid var(--border-light);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .btn-danger {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      .btn-danger:hover {
+        background: #ef4444;
+        color: #ffffff;
+      }
+
+      .btn-success {
+        background: var(--accent-emerald);
+        color: #ffffff;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      }
+
+      .btn-success:hover {
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        transform: translateY(-2px);
+      }
+
+      /* ===== APP LAYOUT ===== */
+      #app-container {
+        display: none;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(11, 12, 16, 0.85);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border-subtle);
+        padding: 1rem 5%;
+      }
+
+      .header-inner {
+        max-width: 1300px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .logo-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 2px solid var(--accent-pink);
+        padding: 2px;
+      }
+
+      .logo-icon img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .logo-text {
+        font-size: 1.4rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #ffffff 40%, #f472b6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .admin-tag {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        background: rgba(236, 72, 153, 0.15);
+        border: 1px solid rgba(236, 72, 153, 0.3);
+        color: var(--accent-pink);
+        padding: 3px 8px;
+        border-radius: 6px;
+        margin-left: 8px;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .main-container {
+        max-width: 1300px;
+        margin: 2rem auto;
+        padding: 0 5%;
+      }
+
+      /* ===== NAVIGATION TABS ===== */
+      .nav-tabs {
+        display: flex;
+        gap: 8px;
+        border-bottom: 1px solid var(--border-subtle);
+        padding-bottom: 1rem;
+        margin-bottom: 2.5rem;
+        overflow-x: auto;
+      }
+
+      .tab-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1px solid transparent;
+        border-radius: var(--radius-full);
+        font-family: inherit;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        white-space: nowrap;
+      }
+
+      .tab-btn:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #ffffff;
+      }
+
+      .tab-btn.active {
+        background: rgba(236, 72, 153, 0.15);
+        color: var(--accent-pink);
+        border-color: rgba(236, 72, 153, 0.3);
+      }
+
+      .tab-content {
+        display: none;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      /* ===== STATS OVERVIEW CARDS ===== */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+      }
+
+      .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 1.8rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--accent-pink);
+      }
+
+      .stat-card.cyan::before {
+        background: var(--accent-cyan);
+      }
+      .stat-card.purple::before {
+        background: var(--accent-purple);
+      }
+      .stat-card.emerald::before {
+        background: var(--accent-emerald);
+      }
+
+      .stat-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-value {
+        font-size: 2.2rem;
+        font-weight: 800;
+        font-family: "Outfit", sans-serif;
+        color: #ffffff;
+      }
+
+      .stat-sub {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+      }
+
+      /* ===== CARD CONTAINERS ===== */
+      .card-box {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 2.2rem;
+        margin-bottom: 2rem;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.8rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .card-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+      }
+
+      /* ===== MODEL CRUD & FILTER PILLS ===== */
+      .category-pills {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+      }
+
+      .cat-pill {
+        padding: 6px 16px;
+        border-radius: var(--radius-full);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border-subtle);
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .cat-pill:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+      }
+
+      .cat-pill.active {
+        background: var(--accent-pink);
+        color: #ffffff;
+        border-color: var(--accent-pink);
+      }
+
+      /* Upload Form */
+      .upload-zone {
+        border: 2px dashed rgba(255, 255, 255, 0.15);
+        border-radius: var(--radius-lg);
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-bottom: 1.5rem;
+        background: rgba(255, 255, 255, 0.01);
+      }
+
+      .upload-zone:hover, .upload-zone.dragover {
+        border-color: var(--accent-pink);
+        background: rgba(236, 72, 153, 0.05);
+      }
+
+      .upload-icon {
+        font-size: 2.5rem;
+        color: var(--accent-pink);
+        margin-bottom: 1rem;
+      }
+
+      .preview-box {
+        display: none;
+        max-width: 200px;
+        max-height: 200px;
+        margin: 1rem auto;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        border: 1px solid var(--border-light);
+      }
+
+      .preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Models Grid */
+      .models-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .model-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        transition: var(--transition);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .model-card:hover {
+        border-color: rgba(236, 72, 153, 0.4);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .model-thumb {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        background: #1e2029;
+      }
+
+      .model-info {
+        padding: 1rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .model-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .model-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      .model-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: var(--radius-full);
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-secondary);
+      }
+
+      .model-actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 6px;
+        opacity: 0;
+        transition: var(--transition);
+        z-index: 2;
+      }
+
+      .model-card:hover .model-actions {
+        opacity: 1;
+      }
+
+      .model-action-btn {
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(6px);
+        color: #ffffff;
+        border: 1px solid var(--border-light);
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 0.85rem;
+      }
+
+      .model-action-btn.star {
+        color: #94a3b8;
+      }
+
+      .model-action-btn.star.active {
+        background: rgba(236, 72, 153, 0.9);
+        color: #ffffff;
+        border-color: #ec4899;
+        box-shadow: 0 0 12px rgba(236, 72, 153, 0.6);
+      }
+
+      .model-action-btn.star:hover:not(.active) {
+        color: #f472b6;
+        border-color: #f472b6;
+      }
+
+      .model-action-btn.delete {
+        color: #ef4444;
+        border-color: rgba(239, 68, 68, 0.4);
+      }
+
+      .model-action-btn.delete:hover {
+        background: #ef4444;
+        color: #ffffff;
+        transform: scale(1.08);
+      }
+
+      .monthly-release-card {
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.12) 0%, rgba(168, 85, 247, 0.12) 50%, rgba(59, 130, 246, 0.1) 100%);
+        border: 1px solid rgba(236, 72, 153, 0.35);
+        border-radius: var(--radius-lg);
+        padding: 1.8rem 2.2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .monthly-release-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(236, 72, 153, 0.2);
+        color: #f472b6;
+        border: 1px solid rgba(236, 72, 153, 0.4);
+        padding: 4px 12px;
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.6rem;
+      }
+
+      .monthly-stats-row {
+        display: flex;
+        gap: 1.2rem;
+        flex-wrap: wrap;
+        margin-top: 1.2rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .monthly-stat-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-full);
+        padding: 6px 14px;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+      }
+
+      .monthly-stat-pill strong {
+        color: #ffffff;
+      }
+
+      /* ===== SUBSCRIBERS TABLE ===== */
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      th {
+        padding: 12px 16px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border-subtle);
+      }
+
+      td {
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        font-size: 0.95rem;
+      }
+
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      /* ===== TOAST NOTIFICATIONS ===== */
+      #toast-container {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .toast {
+        background: rgba(18, 20, 30, 0.95);
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        padding: 14px 20px;
+        color: #ffffff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.95rem;
+        animation: slideIn 0.3s ease forwards;
+        min-width: 280px;
+      }
+
+      .toast.success {
+        border-color: rgba(16, 185, 129, 0.4);
+      }
+      .toast.success i {
+        color: var(--accent-emerald);
+      }
+
+      .toast.error {
+        border-color: rgba(239, 68, 68, 0.4);
+      }
+      .toast.error i {
+        color: var(--accent-red);
+      }
+
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+
+      /* ===== FILTER BARS ===== */
+      .filter-bar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 1.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        padding: 1rem 1.2rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-subtle);
+      }
+
+      .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .filter-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        white-space: nowrap;
+      }
+
+      .filter-input {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 7px 12px;
+        color: #ffffff;
+        font-size: 0.85rem;
+        font-family: inherit;
+        outline: none;
+        transition: var(--transition);
+      }
+
+      .filter-input:focus {
+        border-color: var(--accent-pink);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .filter-input::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        cursor: pointer;
+        opacity: 0.7;
+      }
+
+      .quick-filter-btn {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-full);
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 5px 12px;
+        cursor: pointer;
+        transition: var(--transition);
+        white-space: nowrap;
+      }
+
+      .quick-filter-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+      }
+
+      .quick-filter-btn.active {
+        background: var(--accent-pink);
+        border-color: var(--accent-pink);
+        color: #ffffff;
+      }
+
+      /* ===== PAGINATION ===== */
+      .pagination-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-subtle);
+      }
+
+      .page-info {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+
+      .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .page-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        color: #ffffff;
+        padding: 5px 11px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+      }
+
+      .page-btn:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--accent-pink);
+      }
+
+      .page-btn.active {
+        background: var(--accent-pink);
+        border-color: var(--accent-pink);
+        color: #ffffff;
+      }
+
+      .page-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+
+      /* ===== AUDIENCE SELECTOR CARDS ===== */
+      .audience-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .audience-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 1.2rem;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .audience-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(236, 72, 153, 0.4);
+      }
+
+      .audience-card.active {
+        border-color: var(--accent-pink);
+        background: rgba(236, 72, 153, 0.08);
+      }
+
+      .audience-card input[type="radio"] {
+        accent-color: var(--accent-pink);
+        margin-top: 4px;
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      .custom-checkbox {
+        accent-color: var(--accent-pink);
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      tr.row-selected td {
+        background: rgba(236, 72, 153, 0.07) !important;
+      }
+
+      .alert-banner {
+        background: rgba(236, 72, 153, 0.1);
+        border: 1px solid rgba(236, 72, 153, 0.3);
+        border-radius: var(--radius-md);
+        padding: 12px 18px;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #ffffff;
+      }
+
+      .alert-banner.cyan {
+        background: rgba(6, 182, 212, 0.1);
+        border-color: rgba(6, 182, 212, 0.3);
+      }
+
+      @media (max-width: 768px) {
+        .card-box {
+          padding: 1.5rem;
+        }
+        .header-inner {
+          flex-direction: column;
+          gap: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Login Modal -->
+    <div id="login-screen">
+      <div class="login-card">
+        <div class="login-logo">
+          <img src="Resources/Logo/Logo Round.webp" alt="ChibiFlex Logo" />
+        </div>
+        <h2 class="login-title">Admin Dashboard</h2>
+        <p class="login-subtitle">Enter password to manage models & subscribers</p>
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label" for="admin-password">Admin Password</label>
+            <input
+              type="password"
+              id="admin-password"
+              class="form-input"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary" id="login-btn">
+            <span>Unlock Dashboard</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <div id="app-container">
+      <header>
+        <div class="header-inner">
+          <div class="logo-group">
+            <div class="logo-icon">
+              <img src="Resources/Logo/Logo Round.webp" alt="ChibiFlex" />
+            </div>
+            <div class="logo-text">Chibi Flex</div>
+            <span class="admin-tag">Admin</span>
+          </div>
+          <div class="header-actions">
+            <a href="index.html" target="_blank" class="btn btn-secondary">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              <span>View Website</span>
+            </a>
+            <button id="logout-btn" class="btn btn-danger">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-container">
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+          <button class="tab-btn active" data-tab="tab-overview">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Overview</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-models">
+            <i class="fa-solid fa-images"></i>
+            <span>Model Images (CRUD)</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-categories">
+            <i class="fa-solid fa-tags"></i>
+            <span>Categories</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-drive">
+            <i class="fa-brands fa-google-drive"></i>
+            <span>Google Drive Link</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-subscribers">
+            <i class="fa-solid fa-envelope-open-text"></i>
+            <span>Subscribers</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-marketing">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Email Marketing</span>
+          </button>
+        </nav>
+
+        <!-- TAB 1: OVERVIEW -->
+        <div id="tab-overview" class="tab-content active">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-title">Total Subscribers</div>
+              <div class="stat-value" id="stat-subscribers">0</div>
+              <div class="stat-sub">Email leads collected from site</div>
+            </div>
+            <div class="stat-card cyan">
+              <div class="stat-title">Total Model Images</div>
+              <div class="stat-value" id="stat-models">0</div>
+              <div class="stat-sub">Active in Cloudflare R2 & DB</div>
+            </div>
+            <div class="stat-card purple">
+              <div class="stat-title">Storage Provider</div>
+              <div class="stat-value" style="font-size: 1.4rem;">Cloudflare R2</div>
+              <div class="stat-sub">chibiflex-bucket (EU)</div>
+            </div>
+            <div class="stat-card emerald">
+              <div class="stat-title">Database Status</div>
+              <div class="stat-value" style="font-size: 1.4rem;">Connected</div>
+              <div class="stat-sub">MongoDB Atlas M0</div>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <h3 class="card-title" style="margin-bottom: 1rem;">Quick Actions</h3>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+              Manage your 3D model portfolio, update the Google Drive download link for subscribers, and broadcast promotional campaigns.
+            </p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <button class="btn btn-secondary" onclick="switchTab('tab-models')">
+                <i class="fa-solid fa-plus"></i> Upload New Model Image
+              </button>
+              <button class="btn btn-secondary" onclick="switchTab('tab-drive')">
+                <i class="fa-brands fa-google-drive"></i> Update Drive Download Link
+              </button>
+              <button class="btn btn-secondary" onclick="exportSubscribersCSV()">
+                <i class="fa-solid fa-download"></i> Export Subscribers (CSV)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: MODEL IMAGES CRUD -->
+        <div id="tab-models" class="tab-content">
+          <!-- Monthly Release Active Drop Card -->
+          <div class="monthly-release-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+              <div>
+                <div class="monthly-release-badge">
+                  <i class="fa-solid fa-sparkles"></i> Active Monthly Release
+                </div>
+                <h2 id="active-drop-title-badge" style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.4rem; color: #ffffff;">
+                  April Releases
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 650px; margin-bottom: 0;">
+                  All designs released this month appear in the <strong>Hero Swiper (This Month's Releases)</strong> on the website, while also staying in their permanent category (Public Releases or Exclusive Designs).
+                </p>
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary" onclick="openEditDropTitleModal()" style="padding: 10px 18px; font-size: 0.9rem;">
+                  <i class="fa-solid fa-pen"></i> Edit Month Title
+                </button>
+                <button type="button" class="btn btn-primary" onclick="openRolloverModal()" style="padding: 10px 20px; font-size: 0.9rem; width: auto;">
+                  <i class="fa-solid fa-arrows-rotate"></i> Start New Monthly Release
+                </button>
+              </div>
+            </div>
+
+            <!-- Stats breakdown row -->
+            <div class="monthly-stats-row">
+              <div class="monthly-stat-pill">
+                <i class="fa-solid fa-layer-group" style="color: var(--accent-pink);"></i>
+                <span>Total in Swiper: <strong id="drop-total-count">0</strong></span>
+              </div>
+              <div class="monthly-stat-pill">
+                <i class="fa-solid fa-shapes" style="color: var(--accent-cyan);"></i>
+                <span>Public Releases: <strong id="drop-public-count">0</strong></span>
+              </div>
+              <div class="monthly-stat-pill">
+                <i class="fa-solid fa-crown" style="color: var(--accent-purple);"></i>
+                <span>Exclusive Designs: <strong id="drop-exclusive-count">0</strong></span>
+              </div>
+              <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: auto; align-self: center;">
+                💡 <em>Typically 7-8 designs per month (e.g. 5 Public + 2 Exclusive)</em>
+              </span>
+            </div>
+          </div>
+
+          <!-- Upload Form -->
+          <div class="card-box">
+            <div class="card-header">
+              <h3 class="card-title">Upload New Model Image</h3>
+              <span style="font-size: 0.85rem; color: var(--text-muted);">Saved directly to Cloudflare R2</span>
+            </div>
+
+            <form id="upload-model-form">
+              <div class="upload-zone" id="drop-zone">
+                <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Choose an image or drag & drop here</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Supports WebP, PNG, JPG (up to 15MB)</p>
+                <input type="file" id="file-input" accept="image/*" style="display: none;" />
+                <div class="preview-box" id="preview-box">
+                  <img id="image-preview" src="" alt="Upload preview" />
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="model-category">Target Category</label>
+                  <select id="model-category" class="form-select" required>
+                    <option value="public-releases" selected>Public Releases</option>
+                    <option value="exclusives">Exclusive Designs</option>
+                    <option value="welcome-pack">Patreon Welcome Pack</option>
+                    <option value="free-models">Free Models</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="model-title">Model Title / Caption (Optional)</label>
+                  <input type="text" id="model-title" class="form-input" placeholder="e.g. Flexi Cute Dino" />
+                </div>
+              </div>
+
+              <!-- This Month's Drop Checkbox -->
+              <div style="margin-bottom: 1.5rem; background: rgba(236, 72, 153, 0.08); border: 1px solid rgba(236, 72, 153, 0.25); border-radius: var(--radius-md); padding: 12px 18px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <input type="checkbox" id="model-is-monthly" checked style="width: 18px; height: 18px; accent-color: var(--accent-pink); cursor: pointer;" />
+                <label for="model-is-monthly" style="margin: 0; cursor: pointer; font-size: 0.95rem; font-weight: 700; color: #ffffff;">
+                  ⭐ Include in Current Monthly Release (Hero Swiper)
+                </label>
+                <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: auto;">
+                  (Shows in active month's Swiper + selected category)
+                </span>
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="upload-btn" style="max-width: 250px;">
+                <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                <span>Upload to Cloudflare R2</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Existing Models Gallery -->
+          <div class="card-box">
+            <div class="card-header">
+              <h3 class="card-title">Model Images Gallery</h3>
+              <div class="category-pills" id="category-filter-pills">
+                <button class="cat-pill active" data-cat="all">All Models</button>
+                <button class="cat-pill" data-cat="monthly-drop"><i class="fa-solid fa-sparkles"></i> This Month's Drop</button>
+                <button class="cat-pill" data-cat="public-releases">Public Releases</button>
+                <button class="cat-pill" data-cat="exclusives">Exclusive Designs</button>
+                <button class="cat-pill" data-cat="welcome-pack">Welcome Pack</button>
+                <button class="cat-pill" data-cat="free-models">Free Models</button>
+              </div>
+            </div>
+
+            <div class="models-grid" id="models-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: CATEGORIES MANAGEMENT -->
+        <div id="tab-categories" class="tab-content">
+          <!-- Add Category Form -->
+          <div class="card-box" style="margin-bottom: 2rem;">
+            <div class="card-header">
+              <h3 class="card-title">Add New Category</h3>
+              <span style="font-size: 0.85rem; color: var(--text-muted);">Organize model sections and portfolios</span>
+            </div>
+            <form id="add-category-form">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="new-cat-name">Category Name *</label>
+                  <input type="text" id="new-cat-name" class="form-input" placeholder="e.g. Articulated Dragons" required />
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="new-cat-slug">URL / ID Slug (Auto or Custom)</label>
+                  <input type="text" id="new-cat-slug" class="form-input" placeholder="e.g. articulated-dragons" />
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="new-cat-order">Sort Order</label>
+                  <input type="number" id="new-cat-order" class="form-input" value="0" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-cat-desc">Description (Optional)</label>
+                <input type="text" id="new-cat-desc" class="form-input" placeholder="Brief note about models in this collection" />
+              </div>
+              <button type="submit" class="btn btn-primary" id="add-cat-btn" style="width: auto;">
+                <i class="fa-solid fa-plus"></i>
+                <span>Add Category</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Existing Categories Table -->
+          <div class="card-box">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">All Categories</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">
+                  Categories dynamically appear in model upload dropdowns and gallery filters.
+                </p>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Category Name</th>
+                    <th>Slug (ID)</th>
+                    <th>Models Count</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="categories-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: GOOGLE DRIVE LINK CONFIG -->
+        <div id="tab-drive" class="tab-content">
+          <div class="card-box" style="max-width: 750px;">
+            <div class="card-header">
+              <h3 class="card-title">Free Models Google Drive Link</h3>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+              When a user submits their email in the <strong>Free Models</strong> section, the website instantly unlocks and reveals this Google Drive link so they can download the 3D models.
+            </p>
+
+            <form id="drive-form">
+              <div class="form-group">
+                <label class="form-label" for="drive-link-input">Google Drive Download Folder / Link</label>
+                <input
+                  type="url"
+                  id="drive-link-input"
+                  class="form-input"
+                  placeholder="https://drive.google.com/drive/folders/..."
+                  required
+                />
+              </div>
+
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <button type="submit" class="btn btn-success">
+                  <i class="fa-solid fa-floppy-disk"></i>
+                  <span>Save Drive Link</span>
+                </button>
+                <a id="test-drive-link" href="#" target="_blank" class="btn btn-secondary">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  <span>Test Link</span>
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- TAB 4: SUBSCRIBERS (EMAIL LEADS) -->
+        <div id="tab-subscribers" class="tab-content">
+          <div class="card-box">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Subscribed Users (Leads)</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">
+                  Total Leads: <strong id="subscribers-count" style="color: #ffffff;">0</strong>
+                </p>
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-secondary" onclick="exportSubscribersCSV()">
+                  <i class="fa-solid fa-file-csv"></i>
+                  <span>Export CSV</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-bar">
+              <div class="filter-group" style="flex: 1; min-width: 220px;">
+                <input
+                  type="text"
+                  id="search-subscribers"
+                  class="filter-input"
+                  placeholder="🔍 Search by email address..."
+                  style="width: 100%;"
+                />
+              </div>
+              <div class="filter-group">
+                <span class="filter-label">From:</span>
+                <input type="date" id="subs-date-from" class="filter-input" />
+              </div>
+              <div class="filter-group">
+                <span class="filter-label">To:</span>
+                <input type="date" id="subs-date-to" class="filter-input" />
+              </div>
+              <div class="filter-group" style="flex-wrap: wrap;">
+                <button type="button" class="quick-filter-btn active" data-target="subs" data-range="all">All Time</button>
+                <button type="button" class="quick-filter-btn" data-target="subs" data-range="today">Today</button>
+                <button type="button" class="quick-filter-btn" data-target="subs" data-range="7d">Last 7d</button>
+                <button type="button" class="quick-filter-btn" data-target="subs" data-range="30d">Last 30d</button>
+                <button type="button" class="btn btn-secondary" id="subs-clear-filter" style="padding: 5px 11px; font-size: 0.8rem;" title="Reset filters">
+                  <i class="fa-solid fa-rotate-left"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>Email Address</th>
+                    <th>Subscribed Date & Time</th>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="subscribers-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            <div class="pagination-bar">
+              <div class="page-info" id="subs-page-info">Showing 0 of 0 leads</div>
+              <div class="pagination-controls">
+                <div style="display: flex; align-items: center; gap: 6px; margin-right: 10px;">
+                  <span style="font-size: 0.8rem; color: var(--text-muted);">Rows:</span>
+                  <select id="subs-per-page" class="filter-input" style="padding: 4px 8px; font-size: 0.8rem;">
+                    <option value="10">10</option>
+                    <option value="25" selected>25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+                <button type="button" class="page-btn" id="subs-page-prev" title="Previous page">
+                  <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div id="subs-page-numbers" style="display: flex; gap: 4px;"></div>
+                <button type="button" class="page-btn" id="subs-page-next" title="Next page">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: EMAIL MARKETING -->
+        <div id="tab-marketing" class="tab-content">
+          <!-- SMTP Settings -->
+          <div class="card-box" style="margin-bottom: 2rem;">
+            <div class="card-header">
+              <h3 class="card-title">SMTP Mail Server Settings</h3>
+              <span style="font-size: 0.85rem; color: var(--text-muted);">Supports Gmail App Passwords, Brevo, SendGrid</span>
+            </div>
+            <form id="smtp-form">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="smtp-host">SMTP Host</label>
+                  <input type="text" id="smtp-host" class="form-input" placeholder="smtp.gmail.com" />
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="smtp-port">Port</label>
+                  <input type="number" id="smtp-port" class="form-input" placeholder="465" />
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="smtp-user">Email / User</label>
+                  <input type="email" id="smtp-user" class="form-input" placeholder="youremail@gmail.com" />
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="smtp-pass">Password / App Password</label>
+                  <input type="password" id="smtp-pass" class="form-input" placeholder="••••••••••••" />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-secondary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save SMTP Configuration</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Audience Selection & Subscribers Picker -->
+          <div class="card-box" style="margin-bottom: 2rem;">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Campaign Recipients & Targeting</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">
+                  Choose whether to broadcast to everyone or select specific subscribers from the table below.
+                </p>
+              </div>
+              <span style="color: var(--accent-pink); font-size: 0.9rem; font-weight: 700;">
+                <i class="fa-solid fa-users"></i> Total Database Leads: <span id="marketing-recipient-count">0</span>
+              </span>
+            </div>
+
+            <!-- Audience Mode Radio Cards -->
+            <div class="audience-grid">
+              <label class="audience-card active" id="card-aud-all">
+                <input type="radio" name="mkt-audience-type" value="all" checked />
+                <div>
+                  <div style="font-weight: 700; font-size: 1rem; margin-bottom: 4px;">All Active Subscribers</div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+                    Send campaign to all registered email leads in your database.
+                  </div>
+                  <span class="model-badge" id="badge-all-count" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);">
+                    0 Recipients
+                  </span>
+                </div>
+              </label>
+
+              <label class="audience-card" id="card-aud-selected">
+                <input type="radio" name="mkt-audience-type" value="selected" />
+                <div>
+                  <div style="font-weight: 700; font-size: 1rem; margin-bottom: 4px;">Specific / Selected Subscribers</div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+                    Select specific users from the subscriber table or filter by date.
+                  </div>
+                  <span class="model-badge" id="badge-selected-count" style="background: rgba(236, 72, 153, 0.15); color: var(--accent-pink);">
+                    0 Selected
+                  </span>
+                </div>
+              </label>
+            </div>
+
+            <!-- Subscribers Selection Table Section -->
+            <div id="mkt-subscribers-picker" style="display: none; border-top: 1px solid var(--border-subtle); padding-top: 1.5rem; margin-top: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 1rem;">
+                <div>
+                  <h4 style="font-size: 1.1rem; margin-bottom: 2px;">
+                    <i class="fa-solid fa-user-check" style="color: var(--accent-pink); margin-right: 6px;"></i>
+                    Select Target Subscribers
+                  </h4>
+                  <p style="font-size: 0.85rem; color: var(--text-muted);">
+                    Check the boxes next to the users you want to receive this campaign.
+                  </p>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.85rem;" id="mkt-select-all-filtered-btn">
+                    <i class="fa-solid fa-check-double"></i> Select All Filtered
+                  </button>
+                  <button type="button" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.85rem;" id="mkt-select-all-btn">
+                    <i class="fa-solid fa-list-check"></i> Select All
+                  </button>
+                  <button type="button" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.85rem;" id="mkt-deselect-all-btn">
+                    <i class="fa-solid fa-xmark"></i> Deselect All
+                  </button>
+                </div>
+              </div>
+
+              <!-- Filter Bar for Recipient Picker -->
+              <div class="filter-bar">
+                <div class="filter-group" style="flex: 1; min-width: 220px;">
+                  <input
+                    type="text"
+                    id="mkt-search-email"
+                    class="filter-input"
+                    placeholder="🔍 Filter subscribers by email..."
+                    style="width: 100%;"
+                  />
+                </div>
+                <div class="filter-group">
+                  <span class="filter-label">From:</span>
+                  <input type="date" id="mkt-date-from" class="filter-input" />
+                </div>
+                <div class="filter-group">
+                  <span class="filter-label">To:</span>
+                  <input type="date" id="mkt-date-to" class="filter-input" />
+                </div>
+                <div class="filter-group" style="flex-wrap: wrap;">
+                  <button type="button" class="quick-filter-btn active" data-target="mkt" data-range="all">All Time</button>
+                  <button type="button" class="quick-filter-btn" data-target="mkt" data-range="today">Today</button>
+                  <button type="button" class="quick-filter-btn" data-target="mkt" data-range="7d">Last 7d</button>
+                  <button type="button" class="quick-filter-btn" data-target="mkt" data-range="30d">Last 30d</button>
+                  <button type="button" class="btn btn-secondary" id="mkt-clear-filter" style="padding: 5px 11px; font-size: 0.8rem;" title="Reset filters">
+                    <i class="fa-solid fa-rotate-left"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Selection Table -->
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width: 45px; text-align: center;">
+                        <input type="checkbox" id="mkt-master-check" class="custom-checkbox" title="Toggle current page" />
+                      </th>
+                      <th style="width: 45px;">#</th>
+                      <th>Email Address</th>
+                      <th>Subscribed Date & Time</th>
+                      <th>Source</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="mkt-subscribers-table-body">
+                    <!-- Dynamically populated -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination for Recipient Picker -->
+              <div class="pagination-bar">
+                <div class="page-info" id="mkt-page-info">Showing 0 of 0 subscribers</div>
+                <div class="pagination-controls">
+                  <div style="display: flex; align-items: center; gap: 6px; margin-right: 10px;">
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Rows:</span>
+                    <select id="mkt-per-page" class="filter-input" style="padding: 4px 8px; font-size: 0.8rem;">
+                      <option value="10" selected>10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                    </select>
+                  </div>
+                  <button type="button" class="page-btn" id="mkt-page-prev" title="Previous page">
+                    <i class="fa-solid fa-chevron-left"></i>
+                  </button>
+                  <div id="mkt-page-numbers" style="display: flex; gap: 4px;"></div>
+                  <button type="button" class="page-btn" id="mkt-page-next" title="Next page">
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Email Broadcast Composer -->
+          <div class="card-box">
+            <div class="card-header">
+              <h3 class="card-title">Compose & Send Email</h3>
+            </div>
+
+            <!-- Target Summary Alert Banner -->
+            <div class="alert-banner" id="mkt-target-summary-banner">
+              <i class="fa-solid fa-bullhorn" style="font-size: 1.2rem; color: var(--accent-pink);"></i>
+              <span id="mkt-target-summary-text">Target: <strong>All Active Subscribers</strong> (broadcast mode)</span>
+            </div>
+
+            <form id="broadcast-form">
+              <div class="form-group">
+                <label class="form-label" for="email-subject">Subject Line *</label>
+                <input
+                  type="text"
+                  id="email-subject"
+                  class="form-input"
+                  placeholder="e.g. Exclusive New 3D Flexi Designs & 50% Off Patreon Special! 🎉"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="email-body">Email Content (HTML & Plain Text Supported) *</label>
+                <textarea
+                  id="email-body"
+                  class="form-textarea"
+                  style="min-height: 220px;"
+                  placeholder="Hi there! We just released brand new articulated flexi models. Check them out on our site or support us on Patreon..."
+                  required
+                ></textarea>
+              </div>
+
+              <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary" id="send-test-btn">
+                  <i class="fa-solid fa-vial"></i>
+                  <span>Send Test Email</span>
+                </button>
+                <button type="submit" class="btn btn-primary" id="broadcast-btn" style="width: auto;">
+                  <i class="fa-solid fa-paper-plane"></i>
+                  <span id="broadcast-btn-text">Send to All Subscribers (0)</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Category Edit Modal -->
+    <div id="category-edit-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+      <div class="card-box" style="max-width: 520px; width: 100%; border: 1px solid var(--border-glow); box-shadow: 0 25px 60px rgba(0,0,0,0.8); background: #12141c;">
+        <div class="card-header" style="margin-bottom: 1.5rem;">
+          <h3 class="card-title">Edit Category</h3>
+          <button type="button" class="btn btn-secondary" style="padding: 6px 12px;" onclick="closeCategoryModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form id="edit-category-form">
+          <input type="hidden" id="edit-cat-id" />
+          <div class="form-group">
+            <label class="form-label" for="edit-cat-name">Category Name *</label>
+            <input type="text" id="edit-cat-name" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-cat-slug">Slug (Unique identifier)</label>
+            <input type="text" id="edit-cat-slug" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-cat-desc">Description</label>
+            <input type="text" id="edit-cat-desc" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-cat-order">Sort Order</label>
+            <input type="number" id="edit-cat-order" class="form-input" />
+          </div>
+          <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeCategoryModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" style="width: auto;">
+              <i class="fa-solid fa-floppy-disk"></i> Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Active Monthly Release Title Modal -->
+    <div id="edit-month-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+      <div class="card-box" style="max-width: 500px; width: 100%; border: 1px solid var(--border-glow); box-shadow: 0 25px 60px rgba(0,0,0,0.8); background: #12141c;">
+        <div class="card-header" style="margin-bottom: 1.2rem;">
+          <h3 class="card-title">Edit Active Month Title</h3>
+          <button type="button" class="btn btn-secondary" style="padding: 6px 12px;" onclick="closeEditDropTitleModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+          This title appears directly above the 3D Swiper on the website (e.g. <em>April Releases</em>, <em>April 2026 Collection</em>).
+        </p>
+        <form id="edit-month-title-form">
+          <div class="form-group">
+            <label class="form-label" for="edit-month-title-input">Release Month Title *</label>
+            <input type="text" id="edit-month-title-input" class="form-input" placeholder="e.g. April Releases" required />
+          </div>
+          <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeEditDropTitleModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" style="width: auto;">
+              <i class="fa-solid fa-floppy-disk"></i> Save Title
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Monthly Rollover Modal -->
+    <div id="monthly-rollover-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+      <div class="card-box" style="max-width: 560px; width: 100%; border: 1px solid var(--border-glow); box-shadow: 0 25px 60px rgba(0,0,0,0.8); background: #12141c;">
+        <div class="card-header" style="margin-bottom: 1.2rem;">
+          <div>
+            <h3 class="card-title"><i class="fa-solid fa-arrows-rotate" style="color: var(--accent-pink);"></i> Start New Monthly Release</h3>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Launch the next monthly drop</span>
+          </div>
+          <button type="button" class="btn btn-secondary" style="padding: 6px 12px;" onclick="closeRolloverModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div style="background: rgba(236, 72, 153, 0.08); border: 1px solid rgba(236, 72, 153, 0.25); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 1.5rem;">
+          <h4 style="font-size: 0.95rem; margin-bottom: 0.4rem; color: #ffffff;">How Rollover Works:</h4>
+          <ul style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; padding-left: 20px; line-height: 1.6;">
+            <li>Current drop models (<strong id="rollover-current-title">April Releases</strong>) will be <strong>archived from the Swiper</strong>.</li>
+            <li>All models <strong>permanently remain</strong> in their categories (<em>Public Releases</em> stay in Public, <em>Exclusives</em> stay in Exclusives). Nothing is deleted!</li>
+            <li>The Hero Swiper is reset clean and ready for your new month's uploads.</li>
+          </ul>
+        </div>
+
+        <form id="monthly-rollover-form">
+          <div class="form-group">
+            <label class="form-label" for="rollover-next-title">New Monthly Release Title *</label>
+            <input type="text" id="rollover-next-title" class="form-input" placeholder="e.g. May Releases" required />
+          </div>
+
+          <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeRolloverModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="rollover-submit-btn" style="width: auto;">
+              <i class="fa-solid fa-arrows-rotate"></i> Launch New Monthly Drop
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+      const API_BASE = '/api';
+      let token = localStorage.getItem('adminToken') || '';
+      let allModels = [];
+      let allSubscribers = [];
+      let allCategories = [];
+      let currentCategory = 'all';
+      let currentActiveRelease = null;
+
+      // Elements
+      const loginScreen = document.getElementById('login-screen');
+      const appContainer = document.getElementById('app-container');
+      const loginForm = document.getElementById('login-form');
+      const logoutBtn = document.getElementById('logout-btn');
+
+      // Toast Notification
+      function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+          <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>
+          <span>${message}</span>
+        `;
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateX(100%)';
+          setTimeout(() => toast.remove(), 300);
+        }, 4000);
+      }
+
+      // Headers with Auth Token
+      function getAuthHeaders() {
+        return {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        };
+      }
+
+      // Check Session on Load
+      if (token) {
+        showDashboard();
+      }
+
+      function showDashboard() {
+        loginScreen.style.display = 'none';
+        appContainer.style.display = 'block';
+        loadDashboardData();
+      }
+
+      function showLogin() {
+        token = '';
+        localStorage.removeItem('adminToken');
+        loginScreen.style.display = 'flex';
+        appContainer.style.display = 'none';
+      }
+
+      // Login Form Submit
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const password = document.getElementById('admin-password').value;
+        const btn = document.getElementById('login-btn');
+        btn.disabled = true;
+
+        try {
+          const res = await fetch(`${API_BASE}/admin/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password }),
+          });
+
+          const data = await res.json();
+          if (res.ok && data.token) {
+            token = data.token;
+            localStorage.setItem('adminToken', token);
+            showToast('Welcome back, Admin!');
+            showDashboard();
+          } else {
+            showToast(data.error || 'Incorrect password', 'error');
+          }
+        } catch (err) {
+          showToast('Failed to connect to API server', 'error');
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      // Logout
+      logoutBtn.addEventListener('click', () => {
+        showLogin();
+        showToast('Logged out successfully');
+      });
+
+      // Tab Switching
+      window.switchTab = function (tabId) {
+        document.querySelectorAll('.tab-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.tab === tabId);
+        });
+        document.querySelectorAll('.tab-content').forEach((content) => {
+          content.classList.toggle('active', content.id === tabId);
+        });
+      };
+
+      document.querySelectorAll('.tab-btn').forEach((btn) => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+
+      // Load All Data
+      async function loadDashboardData() {
+        await Promise.all([
+          fetchCategories(),
+          fetchModels(),
+          fetchMonthlyReleaseInfo(),
+          fetchSubscribers(),
+          fetchSettings(),
+        ]);
+      }
+
+      // Fetch Categories
+      async function fetchCategories() {
+        try {
+          const res = await fetch(`${API_BASE}/categories`);
+          if (res.ok) {
+            allCategories = await res.json();
+            renderCategories(allCategories);
+            updateCategoryDropdowns(allCategories);
+            updateCategoryFilterPills(allCategories);
+          }
+        } catch (err) {
+          console.error('Failed to fetch categories:', err);
+        }
+      }
+
+      // Render Categories Table
+      function renderCategories(list) {
+        const tbody = document.getElementById('categories-table-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        if (!list || list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No categories found.</td></tr>`;
+          return;
+        }
+
+        list.forEach((cat) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${escapeHtml(cat.name)}</strong></td>
+            <td><span class="model-badge" style="background: rgba(236, 72, 153, 0.15); color: var(--accent-pink);">${escapeHtml(cat.slug)}</span></td>
+            <td><span class="model-badge" style="background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); font-weight: 700;">${cat.modelCount || 0} models</span></td>
+            <td style="color: var(--text-muted); font-size: 0.85rem; max-width: 280px;">${escapeHtml(cat.description || '-')}</td>
+            <td>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.8rem;" onclick="openEditCategoryModal('${cat._id}')" title="Edit Category">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="deleteCategory('${cat._id}', '${escapeAttr(cat.name)}', ${cat.modelCount || 0})" title="Delete Category">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Update Category Dropdowns in Forms
+      function updateCategoryDropdowns(list) {
+        const select = document.getElementById('model-category');
+        if (!select) return;
+        const currentVal = select.value;
+        select.innerHTML = '';
+        list.forEach((cat) => {
+          const opt = document.createElement('option');
+          opt.value = cat.slug;
+          opt.textContent = cat.name;
+          select.appendChild(opt);
+        });
+        if (currentVal && list.some(c => c.slug === currentVal)) {
+          select.value = currentVal;
+        }
+      }
+
+      // Update Filter Pills in Model Gallery
+      function updateCategoryFilterPills(list) {
+        const container = document.getElementById('category-filter-pills');
+        if (!container) return;
+
+        let pillsHtml = `<button class="cat-pill ${currentCategory === 'all' ? 'active' : ''}" data-cat="all">All Models</button>`;
+        pillsHtml += `<button class="cat-pill ${currentCategory === 'monthly-drop' ? 'active' : ''}" data-cat="monthly-drop"><i class="fa-solid fa-sparkles"></i> This Month's Drop</button>`;
+        list.forEach((cat) => {
+          pillsHtml += `<button class="cat-pill ${currentCategory === cat.slug ? 'active' : ''}" data-cat="${escapeAttr(cat.slug)}">${escapeHtml(cat.name)}</button>`;
+        });
+        container.innerHTML = pillsHtml;
+
+        // Rebind click events
+        container.querySelectorAll('.cat-pill').forEach((pill) => {
+          pill.addEventListener('click', () => {
+            container.querySelectorAll('.cat-pill').forEach((p) => p.classList.remove('active'));
+            pill.classList.add('active');
+            currentCategory = pill.dataset.cat;
+            renderModels();
+          });
+        });
+      }
+
+      // Auto-generate slug helper on Add Category Form
+      const newCatNameInput = document.getElementById('new-cat-name');
+      const newCatSlugInput = document.getElementById('new-cat-slug');
+      if (newCatNameInput && newCatSlugInput) {
+        newCatNameInput.addEventListener('input', () => {
+          if (!newCatSlugInput.dataset.manual) {
+            newCatSlugInput.value = newCatNameInput.value
+              .toLowerCase()
+              .trim()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-+|-+$/g, '');
+          }
+        });
+        newCatSlugInput.addEventListener('input', () => {
+          newCatSlugInput.dataset.manual = newCatSlugInput.value.length > 0 ? 'true' : '';
+        });
+      }
+
+      // Add Category Form Submit
+      const addCategoryForm = document.getElementById('add-category-form');
+      if (addCategoryForm) {
+        addCategoryForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const name = document.getElementById('new-cat-name').value.trim();
+          const slug = document.getElementById('new-cat-slug').value.trim();
+          const order = document.getElementById('new-cat-order').value;
+          const description = document.getElementById('new-cat-desc').value.trim();
+          const btn = document.getElementById('add-cat-btn');
+
+          if (!name) {
+            showToast('Category name is required', 'error');
+            return;
+          }
+
+          btn.disabled = true;
+          try {
+            const res = await fetch(`${API_BASE}/categories`, {
+              method: 'POST',
+              headers: getAuthHeaders(),
+              body: JSON.stringify({ name, slug, order, description }),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+              showToast(`Category "${name}" created successfully!`);
+              addCategoryForm.reset();
+              if (newCatSlugInput) delete newCatSlugInput.dataset.manual;
+              await fetchCategories();
+            } else {
+              showToast(data.error || 'Failed to add category', 'error');
+            }
+          } catch (err) {
+            showToast('Request failed', 'error');
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      }
+
+      // Open Edit Category Modal
+      window.openEditCategoryModal = function (id) {
+        const cat = allCategories.find((c) => c._id === id);
+        if (!cat) return;
+
+        document.getElementById('edit-cat-id').value = cat._id;
+        document.getElementById('edit-cat-name').value = cat.name;
+        document.getElementById('edit-cat-slug').value = cat.slug;
+        document.getElementById('edit-cat-desc').value = cat.description || '';
+        document.getElementById('edit-cat-order').value = cat.order !== undefined ? cat.order : 0;
+
+        const modal = document.getElementById('category-edit-modal');
+        if (modal) modal.style.display = 'flex';
+      };
+
+      // Close Edit Category Modal
+      window.closeCategoryModal = function () {
+        const modal = document.getElementById('category-edit-modal');
+        if (modal) modal.style.display = 'none';
+      };
+
+      // Edit Category Form Submit
+      const editCategoryForm = document.getElementById('edit-category-form');
+      if (editCategoryForm) {
+        editCategoryForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const id = document.getElementById('edit-cat-id').value;
+          const name = document.getElementById('edit-cat-name').value.trim();
+          const slug = document.getElementById('edit-cat-slug').value.trim();
+          const description = document.getElementById('edit-cat-desc').value.trim();
+          const order = document.getElementById('edit-cat-order').value;
+
+          try {
+            const res = await fetch(`${API_BASE}/categories/${id}`, {
+              method: 'PUT',
+              headers: getAuthHeaders(),
+              body: JSON.stringify({ name, slug, description, order }),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+              showToast('Category updated successfully!');
+              closeCategoryModal();
+              await Promise.all([fetchCategories(), fetchModels()]);
+            } else {
+              showToast(data.error || 'Failed to update category', 'error');
+            }
+          } catch (err) {
+            showToast('Update failed', 'error');
+          }
+        });
+      }
+
+      // Delete Category
+      window.deleteCategory = async function (id, name, modelCount) {
+        let confirmMsg = `Are you sure you want to delete category "${name}"?`;
+        let force = false;
+
+        if (modelCount > 0) {
+          confirmMsg = `Category "${name}" currently contains ${modelCount} model(s).\n\nDeleting it will remove the category. Proceed with force delete?`;
+          force = true;
+        }
+
+        if (!confirm(confirmMsg)) return;
+
+        try {
+          const url = `${API_BASE}/categories/${id}${force ? '?force=true' : ''}`;
+          const res = await fetch(url, {
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            showToast(data.message || 'Category deleted');
+            if (currentCategory === id) currentCategory = 'all';
+            await Promise.all([fetchCategories(), fetchModels()]);
+          } else {
+            showToast(data.error || 'Failed to delete category', 'error');
+          }
+        } catch (err) {
+          showToast('Delete request error', 'error');
+        }
+      };
+
+      // Helper escape functions
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+      function escapeAttr(str) {
+        if (!str) return '';
+        return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+
+      // Fetch Models
+      async function fetchModels() {
+        try {
+          const res = await fetch(`${API_BASE}/models`);
+          if (res.ok) {
+            allModels = await res.json();
+            document.getElementById('stat-models').textContent = allModels.length;
+            renderModels();
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      // Render Models Grid with Filter
+      function renderModels() {
+        const grid = document.getElementById('models-grid');
+        grid.innerHTML = '';
+
+        const filtered = currentCategory === 'all'
+          ? allModels
+          : currentCategory === 'monthly-drop'
+          ? allModels.filter((m) => m.isCurrentMonthly === true)
+          : allModels.filter((m) => m.category === currentCategory);
+
+        if (filtered.length === 0) {
+          grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
+              <i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4;"></i>
+              <p>No model images found in this category.</p>
+            </div>
+          `;
+          return;
+        }
+
+        filtered.forEach((model) => {
+          const card = document.createElement('div');
+          card.className = 'model-card';
+
+          const isMonthly = Boolean(model.isCurrentMonthly);
+          const monthlyBadgeHtml = isMonthly
+            ? `<span class="model-badge" style="background: rgba(236, 72, 153, 0.25); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.5); font-weight: 700;"><i class="fa-solid fa-star"></i> In Swiper</span>`
+            : '';
+
+          card.innerHTML = `
+            <img src="${model.imageUrl}" alt="${escapeAttr(model.title || 'Model')}" class="model-thumb" loading="lazy" />
+            <div class="model-actions">
+              <button class="model-action-btn star ${isMonthly ? 'active' : ''}" 
+                      title="${isMonthly ? 'Remove from This Month Release' : 'Add to This Month Release'}" 
+                      onclick="toggleModelMonthly('${model._id}')">
+                <i class="fa-solid ${isMonthly ? 'fa-star' : 'fa-star-half-stroke'}"></i>
+              </button>
+              <button class="model-action-btn delete" title="Delete Model" onclick="deleteModel('${model._id}')">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+            <div class="model-info">
+              <div class="model-title">${escapeHtml(model.title || 'Untitled Model')}</div>
+              <div class="model-meta">
+                <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                  <span class="model-badge">${escapeHtml(model.category)}</span>
+                  ${monthlyBadgeHtml}
+                </div>
+                <span>${new Date(model.createdAt).toLocaleDateString()}</span>
+              </div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }
+
+      // Upload Zone & Drag Drop
+      const dropZone = document.getElementById('drop-zone');
+      const fileInput = document.getElementById('file-input');
+      const previewBox = document.getElementById('preview-box');
+      const imagePreview = document.getElementById('image-preview');
+
+      dropZone.addEventListener('click', () => fileInput.click());
+
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      });
+
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+          fileInput.files = e.dataTransfer.files;
+          handleFilePreview(fileInput.files[0]);
+        }
+      });
+
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) {
+          handleFilePreview(fileInput.files[0]);
+        }
+      });
+
+      function handleFilePreview(file) {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          imagePreview.src = e.target.result;
+          previewBox.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // Upload Model Form Submit
+      document.getElementById('upload-model-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!fileInput.files.length) {
+          showToast('Please select an image to upload', 'error');
+          return;
+        }
+
+        const btn = document.getElementById('upload-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading to R2...';
+
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+        formData.append('category', document.getElementById('model-category').value);
+        formData.append('title', document.getElementById('model-title').value.trim());
+
+        const isMonthly = document.getElementById('model-is-monthly')?.checked || false;
+        formData.append('isCurrentMonthly', isMonthly);
+
+        try {
+          const res = await fetch(`${API_BASE}/models`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            showToast('Model image uploaded successfully to Cloudflare R2!');
+            fileInput.value = '';
+            previewBox.style.display = 'none';
+            document.getElementById('model-title').value = '';
+            await Promise.all([fetchModels(), fetchMonthlyReleaseInfo(), fetchCategories()]);
+          } else {
+            showToast(data.error || 'Failed to upload', 'error');
+          }
+        } catch (err) {
+          showToast('Upload request failed', 'error');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-arrow-up-from-bracket"></i> <span>Upload to Cloudflare R2</span>';
+        }
+      });
+
+      // Delete Model
+      window.deleteModel = async function (id) {
+        if (!confirm('Are you sure you want to permanently delete this model image from Cloudflare R2?')) {
+          return;
+        }
+
+        try {
+          const res = await fetch(`${API_BASE}/models/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+          });
+
+          if (res.ok) {
+            showToast('Model deleted from R2 and Database');
+            await Promise.all([fetchModels(), fetchMonthlyReleaseInfo(), fetchCategories()]);
+          } else {
+            const data = await res.json();
+            showToast(data.error || 'Failed to delete model', 'error');
+          }
+        } catch (err) {
+          showToast('Delete request error', 'error');
+        }
+      };
+
+      // ==========================================
+      // MONTHLY RELEASE MANAGEMENT (ADMIN)
+      // ==========================================
+
+      // Fetch Monthly Release Info
+      async function fetchMonthlyReleaseInfo() {
+        try {
+          const res = await fetch(`${API_BASE}/admin/monthly-release`, {
+            headers: getAuthHeaders(),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            currentActiveRelease = data.activeRelease;
+
+            const titleBadge = document.getElementById('active-drop-title-badge');
+            if (titleBadge) titleBadge.textContent = data.activeRelease.title || 'April Releases';
+
+            const totalEl = document.getElementById('drop-total-count');
+            if (totalEl) totalEl.textContent = data.total;
+
+            const publicEl = document.getElementById('drop-public-count');
+            if (publicEl) publicEl.textContent = data.publicCount;
+
+            const exclusiveEl = document.getElementById('drop-exclusive-count');
+            if (exclusiveEl) exclusiveEl.textContent = data.exclusiveCount;
+          }
+        } catch (err) {
+          console.error('Failed to fetch monthly release info:', err);
+        }
+      }
+
+      // 1-Click Toggle Model Current Monthly Drop Status
+      window.toggleModelMonthly = async function (id) {
+        try {
+          const res = await fetch(`${API_BASE}/admin/monthly-release/toggle-model/${id}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            showToast(data.isCurrentMonthly ? 'Added to Current Monthly Drop ⭐' : 'Removed from Current Monthly Drop');
+            await Promise.all([fetchModels(), fetchMonthlyReleaseInfo()]);
+          } else {
+            showToast(data.error || 'Failed to toggle status', 'error');
+          }
+        } catch (err) {
+          showToast('Request failed', 'error');
+        }
+      };
+
+      // Rollover Modal Handlers
+      window.openRolloverModal = function () {
+        const currentTitle = currentActiveRelease?.title || 'April Releases';
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        let guessedNext = 'May Releases';
+
+        for (let i = 0; i < months.length; i++) {
+          if (currentTitle.toLowerCase().includes(months[i].toLowerCase())) {
+            const nextM = months[(i + 1) % 12];
+            guessedNext = `${nextM} Releases`;
+            break;
+          }
+        }
+
+        const currEl = document.getElementById('rollover-current-title');
+        if (currEl) currEl.textContent = currentTitle;
+
+        const nextInput = document.getElementById('rollover-next-title');
+        if (nextInput) nextInput.value = guessedNext;
+
+        const modal = document.getElementById('monthly-rollover-modal');
+        if (modal) modal.style.display = 'flex';
+      };
+
+      window.closeRolloverModal = function () {
+        const modal = document.getElementById('monthly-rollover-modal');
+        if (modal) modal.style.display = 'none';
+      };
+
+      const monthlyRolloverForm = document.getElementById('monthly-rollover-form');
+      if (monthlyRolloverForm) {
+        monthlyRolloverForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const nextTitle = document.getElementById('rollover-next-title').value.trim();
+          if (!nextTitle) {
+            showToast('New release title is required', 'error');
+            return;
+          }
+
+          const btn = document.getElementById('rollover-submit-btn');
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Rollover...';
+
+          try {
+            const res = await fetch(`${API_BASE}/admin/monthly-release/rollover`, {
+              method: 'POST',
+              headers: getAuthHeaders(),
+              body: JSON.stringify({ nextTitle }),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+              showToast(data.message || 'Rollover complete!');
+              closeRolloverModal();
+              await Promise.all([fetchModels(), fetchMonthlyReleaseInfo()]);
+            } else {
+              showToast(data.error || 'Rollover failed', 'error');
+            }
+          } catch (err) {
+            showToast('Rollover request failed', 'error');
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Launch New Monthly Drop';
+          }
+        });
+      }
+
+      // Edit Month Title Modal Handlers
+      window.openEditDropTitleModal = function () {
+        const currentTitle = currentActiveRelease?.title || 'April Releases';
+        const input = document.getElementById('edit-month-title-input');
+        if (input) input.value = currentTitle;
+        const modal = document.getElementById('edit-month-modal');
+        if (modal) modal.style.display = 'flex';
+      };
+
+      window.closeEditDropTitleModal = function () {
+        const modal = document.getElementById('edit-month-modal');
+        if (modal) modal.style.display = 'none';
+      };
+
+      const editMonthTitleForm = document.getElementById('edit-month-title-form');
+      if (editMonthTitleForm) {
+        editMonthTitleForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const title = document.getElementById('edit-month-title-input').value.trim();
+          if (!title) {
+            showToast('Title is required', 'error');
+            return;
+          }
+
+          try {
+            const res = await fetch(`${API_BASE}/admin/monthly-release`, {
+              method: 'PUT',
+              headers: getAuthHeaders(),
+              body: JSON.stringify({ title }),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+              showToast('Monthly release title updated!');
+              closeEditDropTitleModal();
+              await fetchMonthlyReleaseInfo();
+            } else {
+              showToast(data.error || 'Failed to update title', 'error');
+            }
+          } catch (err) {
+            showToast('Update failed', 'error');
+          }
+        });
+      }
+
+      // ==========================================
+      // SUBSCRIBERS & EMAIL MARKETING STATE
+      // ==========================================
+      let subsCurrentPage = 1;
+      let subsPerPage = 25;
+      let subsSearchQuery = '';
+      let subsDateFrom = '';
+      let subsDateTo = '';
+      let subsDatePreset = 'all';
+
+      let mktAudienceType = 'all'; // 'all' or 'selected'
+      let mktCurrentPage = 1;
+      let mktPerPage = 10;
+      let mktSearchQuery = '';
+      let mktDateFrom = '';
+      let mktDateTo = '';
+      let mktDatePreset = 'all';
+      let mktSelectedEmails = new Set();
+
+      // Date Filtering Helper
+      function matchesDateFilter(dateStr, fromStr, toStr, preset) {
+        if (!dateStr) return false;
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return false;
+
+        const now = new Date();
+
+        if (preset === 'today') {
+          const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          if (d < startOfToday) return false;
+        } else if (preset === '7d') {
+          const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          if (d < sevenDaysAgo) return false;
+        } else if (preset === '30d') {
+          const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          if (d < thirtyDaysAgo) return false;
+        }
+
+        if (fromStr) {
+          const fromDate = new Date(fromStr + 'T00:00:00');
+          if (d < fromDate) return false;
+        }
+
+        if (toStr) {
+          const toDate = new Date(toStr + 'T23:59:59.999');
+          if (d > toDate) return false;
+        }
+
+        return true;
+      }
+
+      // Date Formatting Helper
+      function formatDateTime(dateStr) {
+        if (!dateStr) return '-';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        return d.toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      }
+
+      // Pagination Helper
+      function getPaginatedSlice(list, page, perPage) {
+        const total = list.length;
+        const totalPages = Math.max(1, Math.ceil(total / perPage));
+        const safePage = Math.max(1, Math.min(page, totalPages));
+        const startIndex = (safePage - 1) * perPage;
+        const endIndex = Math.min(startIndex + perPage, total);
+        return {
+          slice: list.slice(startIndex, endIndex),
+          total,
+          totalPages,
+          currentPage: safePage,
+          startIndex,
+          endIndex,
+        };
+      }
+
+      // Fetch Subscribers
+      async function fetchSubscribers() {
+        try {
+          const res = await fetch(`${API_BASE}/subscribers`, {
+            headers: getAuthHeaders(),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            allSubscribers = data.subscribers || [];
+            document.getElementById('stat-subscribers').textContent = allSubscribers.length;
+            document.getElementById('subscribers-count').textContent = allSubscribers.length;
+            document.getElementById('marketing-recipient-count').textContent = allSubscribers.length;
+            const badgeAll = document.getElementById('badge-all-count');
+            if (badgeAll) badgeAll.textContent = `${allSubscribers.length} Recipients`;
+
+            renderSubscribersTab();
+            renderMktSubscribersTable();
+            updateAudienceDisplay();
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      // ==========================================
+      // TAB 4: SUBSCRIBERS TABLE & FILTERS
+      // ==========================================
+      function getFilteredSubscribers() {
+        return allSubscribers.filter((s) => {
+          if (subsSearchQuery && !s.email.toLowerCase().includes(subsSearchQuery)) {
+            return false;
+          }
+          return matchesDateFilter(s.subscribedAt, subsDateFrom, subsDateTo, subsDatePreset);
+        });
+      }
+
+      function renderSubscribersTab() {
+        const filtered = getFilteredSubscribers();
+        const { slice, total, totalPages, currentPage, startIndex, endIndex } = getPaginatedSlice(
+          filtered,
+          subsCurrentPage,
+          subsPerPage
+        );
+        subsCurrentPage = currentPage;
+
+        const tbody = document.getElementById('subscribers-table-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        if (total === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2.5rem;"><i class="fa-solid fa-inbox" style="font-size: 2rem; opacity: 0.3; margin-bottom: 0.8rem; display: block;"></i>No subscribers found matching your criteria.</td></tr>`;
+        } else {
+          slice.forEach((sub, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${startIndex + idx + 1}</td>
+              <td><strong>${escapeHtml(sub.email)}</strong></td>
+              <td title="${sub.subscribedAt || ''}">
+                <i class="fa-regular fa-clock" style="color: var(--accent-pink); margin-right: 6px; font-size: 0.8rem;"></i>
+                ${formatDateTime(sub.subscribedAt)}
+              </td>
+              <td><span class="model-badge">${escapeHtml(sub.source || 'free-model')}</span></td>
+              <td><span class="model-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);">${escapeHtml(sub.status || 'active')}</span></td>
+              <td style="text-align: right;">
+                <div style="display: inline-flex; gap: 6px;">
+                  <button type="button" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.8rem;" title="Compose email to this subscriber" onclick="openDirectEmail('${escapeAttr(sub.email)}')">
+                    <i class="fa-solid fa-paper-plane" style="color: var(--accent-pink);"></i>
+                  </button>
+                  <button type="button" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" title="Delete subscriber" onclick="deleteSubscriber('${sub._id}')">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        // Pagination UI
+        const infoEl = document.getElementById('subs-page-info');
+        if (infoEl) {
+          infoEl.textContent = total === 0 ? 'Showing 0 of 0 leads' : `Showing ${startIndex + 1} to ${endIndex} of ${total} leads`;
+        }
+
+        const prevBtn = document.getElementById('subs-page-prev');
+        const nextBtn = document.getElementById('subs-page-next');
+        if (prevBtn) prevBtn.disabled = currentPage <= 1;
+        if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+
+        const numbersContainer = document.getElementById('subs-page-numbers');
+        if (numbersContainer) {
+          numbersContainer.innerHTML = '';
+          const startP = Math.max(1, currentPage - 2);
+          const endP = Math.min(totalPages, startP + 4);
+          for (let p = startP; p <= endP; p++) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `page-btn ${p === currentPage ? 'active' : ''}`;
+            btn.textContent = p;
+            btn.onclick = () => {
+              subsCurrentPage = p;
+              renderSubscribersTab();
+            };
+            numbersContainer.appendChild(btn);
+          }
+        }
+      }
+
+      // Subscribers Tab Event Listeners
+      const searchSubsInput = document.getElementById('search-subscribers');
+      if (searchSubsInput) {
+        searchSubsInput.addEventListener('input', (e) => {
+          subsSearchQuery = e.target.value.toLowerCase().trim();
+          subsCurrentPage = 1;
+          renderSubscribersTab();
+        });
+      }
+
+      const subsDateFromInput = document.getElementById('subs-date-from');
+      const subsDateToInput = document.getElementById('subs-date-to');
+      if (subsDateFromInput) {
+        subsDateFromInput.addEventListener('change', (e) => {
+          subsDateFrom = e.target.value;
+          subsDatePreset = 'custom';
+          document.querySelectorAll('.quick-filter-btn[data-target="subs"]').forEach(b => b.classList.remove('active'));
+          subsCurrentPage = 1;
+          renderSubscribersTab();
+        });
+      }
+      if (subsDateToInput) {
+        subsDateToInput.addEventListener('change', (e) => {
+          subsDateTo = e.target.value;
+          subsDatePreset = 'custom';
+          document.querySelectorAll('.quick-filter-btn[data-target="subs"]').forEach(b => b.classList.remove('active'));
+          subsCurrentPage = 1;
+          renderSubscribersTab();
+        });
+      }
+
+      document.querySelectorAll('.quick-filter-btn[data-target="subs"]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.quick-filter-btn[data-target="subs"]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          subsDatePreset = btn.dataset.range;
+          if (subsDateFromInput) subsDateFromInput.value = '';
+          if (subsDateToInput) subsDateToInput.value = '';
+          subsDateFrom = '';
+          subsDateTo = '';
+          subsCurrentPage = 1;
+          renderSubscribersTab();
+        });
+      });
+
+      const subsClearBtn = document.getElementById('subs-clear-filter');
+      if (subsClearBtn) {
+        subsClearBtn.addEventListener('click', () => {
+          subsSearchQuery = '';
+          subsDateFrom = '';
+          subsDateTo = '';
+          subsDatePreset = 'all';
+          if (searchSubsInput) searchSubsInput.value = '';
+          if (subsDateFromInput) subsDateFromInput.value = '';
+          if (subsDateToInput) subsDateToInput.value = '';
+          document.querySelectorAll('.quick-filter-btn[data-target="subs"]').forEach(b => {
+            b.classList.toggle('active', b.dataset.range === 'all');
+          });
+          subsCurrentPage = 1;
+          renderSubscribersTab();
+        });
+      }
+
+      const subsPerPageSelect = document.getElementById('subs-per-page');
+      if (subsPerPageSelect) {
+        subsPerPageSelect.addEventListener('change', (e) => {
+          subsPerPage = Number(e.target.value) || 25;
+          subsCurrentPage = 1;
+          renderSubscribersTab();
+        });
+      }
+
+      const subsPrevBtn = document.getElementById('subs-page-prev');
+      if (subsPrevBtn) {
+        subsPrevBtn.addEventListener('click', () => {
+          if (subsCurrentPage > 1) {
+            subsCurrentPage--;
+            renderSubscribersTab();
+          }
+        });
+      }
+
+      const subsNextBtn = document.getElementById('subs-page-next');
+      if (subsNextBtn) {
+        subsNextBtn.addEventListener('click', () => {
+          subsCurrentPage++;
+          renderSubscribersTab();
+        });
+      }
+
+      // ==========================================
+      // TAB 5: EMAIL MARKETING RECIPIENT PICKER
+      // ==========================================
+      function getFilteredMktSubscribers() {
+        return allSubscribers.filter((s) => {
+          if (mktSearchQuery && !s.email.toLowerCase().includes(mktSearchQuery)) {
+            return false;
+          }
+          return matchesDateFilter(s.subscribedAt, mktDateFrom, mktDateTo, mktDatePreset);
+        });
+      }
+
+      function renderMktSubscribersTable() {
+        const filtered = getFilteredMktSubscribers();
+        const { slice, total, totalPages, currentPage, startIndex, endIndex } = getPaginatedSlice(
+          filtered,
+          mktCurrentPage,
+          mktPerPage
+        );
+        mktCurrentPage = currentPage;
+
+        const tbody = document.getElementById('mkt-subscribers-table-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        if (total === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2.5rem;"><i class="fa-solid fa-inbox" style="font-size: 2rem; opacity: 0.3; margin-bottom: 0.8rem; display: block;"></i>No subscribers found matching your criteria.</td></tr>`;
+        } else {
+          slice.forEach((sub, idx) => {
+            const emailKey = (sub.email || '').toLowerCase().trim();
+            const isChecked = mktSelectedEmails.has(emailKey);
+
+            const tr = document.createElement('tr');
+            if (isChecked) tr.classList.add('row-selected');
+
+            tr.innerHTML = `
+              <td style="text-align: center;">
+                <input type="checkbox" class="custom-checkbox mkt-row-checkbox" data-email="${escapeAttr(emailKey)}" ${isChecked ? 'checked' : ''} />
+              </td>
+              <td>${startIndex + idx + 1}</td>
+              <td><strong>${escapeHtml(sub.email)}</strong></td>
+              <td title="${sub.subscribedAt || ''}">
+                <i class="fa-regular fa-clock" style="color: var(--accent-pink); margin-right: 6px; font-size: 0.8rem;"></i>
+                ${formatDateTime(sub.subscribedAt)}
+              </td>
+              <td><span class="model-badge">${escapeHtml(sub.source || 'free-model')}</span></td>
+              <td><span class="model-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);">${escapeHtml(sub.status || 'active')}</span></td>
+            `;
+
+            const cb = tr.querySelector('.mkt-row-checkbox');
+            cb.addEventListener('change', (e) => {
+              if (e.target.checked) {
+                mktSelectedEmails.add(emailKey);
+                tr.classList.add('row-selected');
+              } else {
+                mktSelectedEmails.delete(emailKey);
+                tr.classList.remove('row-selected');
+              }
+              updateAudienceDisplay();
+              updateMasterCheckboxState(slice);
+            });
+
+            tbody.appendChild(tr);
+          });
+        }
+
+        updateMasterCheckboxState(slice);
+
+        // Pagination UI
+        const infoEl = document.getElementById('mkt-page-info');
+        if (infoEl) {
+          infoEl.textContent = total === 0 ? 'Showing 0 of 0 subscribers' : `Showing ${startIndex + 1} to ${endIndex} of ${total} subscribers`;
+        }
+
+        const prevBtn = document.getElementById('mkt-page-prev');
+        const nextBtn = document.getElementById('mkt-page-next');
+        if (prevBtn) prevBtn.disabled = currentPage <= 1;
+        if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+
+        const numbersContainer = document.getElementById('mkt-page-numbers');
+        if (numbersContainer) {
+          numbersContainer.innerHTML = '';
+          const startP = Math.max(1, currentPage - 2);
+          const endP = Math.min(totalPages, startP + 4);
+          for (let p = startP; p <= endP; p++) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `page-btn ${p === currentPage ? 'active' : ''}`;
+            btn.textContent = p;
+            btn.onclick = () => {
+              mktCurrentPage = p;
+              renderMktSubscribersTable();
+            };
+            numbersContainer.appendChild(btn);
+          }
+        }
+      }
+
+      function updateMasterCheckboxState(currentSlice) {
+        const master = document.getElementById('mkt-master-check');
+        if (!master) return;
+        if (!currentSlice || currentSlice.length === 0) {
+          master.checked = false;
+          master.indeterminate = false;
+          return;
+        }
+
+        const checkedCount = currentSlice.filter((s) => mktSelectedEmails.has((s.email || '').toLowerCase().trim())).length;
+        if (checkedCount === currentSlice.length) {
+          master.checked = true;
+          master.indeterminate = false;
+        } else if (checkedCount > 0) {
+          master.checked = false;
+          master.indeterminate = true;
+        } else {
+          master.checked = false;
+          master.indeterminate = false;
+        }
+      }
+
+      // Audience Mode Switcher
+      function updateAudienceDisplay() {
+        const isSelectedMode = mktAudienceType === 'selected';
+        const cardAll = document.getElementById('card-aud-all');
+        const cardSelected = document.getElementById('card-aud-selected');
+        const pickerPanel = document.getElementById('mkt-subscribers-picker');
+        const summaryBanner = document.getElementById('mkt-target-summary-banner');
+        const summaryText = document.getElementById('mkt-target-summary-text');
+        const broadcastBtnText = document.getElementById('broadcast-btn-text');
+
+        if (cardAll) cardAll.classList.toggle('active', !isSelectedMode);
+        if (cardSelected) cardSelected.classList.toggle('active', isSelectedMode);
+
+        if (pickerPanel) {
+          pickerPanel.style.display = isSelectedMode ? 'block' : 'none';
+        }
+
+        const totalActive = allSubscribers.length;
+        const selectedCount = mktSelectedEmails.size;
+
+        if (isSelectedMode) {
+          if (summaryBanner) summaryBanner.className = 'alert-banner cyan';
+          if (summaryText) {
+            summaryText.innerHTML = `Target: <strong>${selectedCount} Selected Subscriber(s)</strong> (custom audience mode)`;
+          }
+          if (broadcastBtnText) {
+            broadcastBtnText.textContent = `Send to ${selectedCount} Selected Subscriber${selectedCount === 1 ? '' : 's'}`;
+          }
+        } else {
+          if (summaryBanner) summaryBanner.className = 'alert-banner';
+          if (summaryText) {
+            summaryText.innerHTML = `Target: <strong>All ${totalActive} Active Subscribers</strong> (broadcast mode)`;
+          }
+          if (broadcastBtnText) {
+            broadcastBtnText.textContent = `Send to All Subscribers (${totalActive})`;
+          }
+        }
+
+        const badgeSelected = document.getElementById('badge-selected-count');
+        if (badgeSelected) {
+          badgeSelected.textContent = `${selectedCount} Selected`;
+        }
+      }
+
+      // Audience Radio Inputs
+      document.querySelectorAll('input[name="mkt-audience-type"]').forEach((radio) => {
+        radio.addEventListener('change', (e) => {
+          mktAudienceType = e.target.value;
+          updateAudienceDisplay();
+        });
+      });
+
+      // Recipient Master Checkbox
+      const masterCheck = document.getElementById('mkt-master-check');
+      if (masterCheck) {
+        masterCheck.addEventListener('change', (e) => {
+          const filtered = getFilteredMktSubscribers();
+          const { slice } = getPaginatedSlice(filtered, mktCurrentPage, mktPerPage);
+          slice.forEach((sub) => {
+            const emailKey = (sub.email || '').toLowerCase().trim();
+            if (e.target.checked) {
+              mktSelectedEmails.add(emailKey);
+            } else {
+              mktSelectedEmails.delete(emailKey);
+            }
+          });
+          renderMktSubscribersTable();
+          updateAudienceDisplay();
+        });
+      }
+
+      // Quick Selection Buttons
+      const selectAllFilteredBtn = document.getElementById('mkt-select-all-filtered-btn');
+      if (selectAllFilteredBtn) {
+        selectAllFilteredBtn.addEventListener('click', () => {
+          const filtered = getFilteredMktSubscribers();
+          filtered.forEach((sub) => {
+            mktSelectedEmails.add((sub.email || '').toLowerCase().trim());
+          });
+          renderMktSubscribersTable();
+          updateAudienceDisplay();
+          showToast(`Selected all ${filtered.length} filtered subscribers`);
+        });
+      }
+
+      const selectAllBtn = document.getElementById('mkt-select-all-btn');
+      if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', () => {
+          allSubscribers.forEach((sub) => {
+            mktSelectedEmails.add((sub.email || '').toLowerCase().trim());
+          });
+          renderMktSubscribersTable();
+          updateAudienceDisplay();
+          showToast(`Selected all ${allSubscribers.length} subscribers`);
+        });
+      }
+
+      const deselectAllBtn = document.getElementById('mkt-deselect-all-btn');
+      if (deselectAllBtn) {
+        deselectAllBtn.addEventListener('click', () => {
+          mktSelectedEmails.clear();
+          renderMktSubscribersTable();
+          updateAudienceDisplay();
+          showToast('Deselected all subscribers');
+        });
+      }
+
+      // Recipient Picker Filters & Pagination Event Listeners
+      const mktSearchInput = document.getElementById('mkt-search-email');
+      if (mktSearchInput) {
+        mktSearchInput.addEventListener('input', (e) => {
+          mktSearchQuery = e.target.value.toLowerCase().trim();
+          mktCurrentPage = 1;
+          renderMktSubscribersTable();
+        });
+      }
+
+      const mktDateFromInput = document.getElementById('mkt-date-from');
+      const mktDateToInput = document.getElementById('mkt-date-to');
+      if (mktDateFromInput) {
+        mktDateFromInput.addEventListener('change', (e) => {
+          mktDateFrom = e.target.value;
+          mktDatePreset = 'custom';
+          document.querySelectorAll('.quick-filter-btn[data-target="mkt"]').forEach(b => b.classList.remove('active'));
+          mktCurrentPage = 1;
+          renderMktSubscribersTable();
+        });
+      }
+      if (mktDateToInput) {
+        mktDateToInput.addEventListener('change', (e) => {
+          mktDateTo = e.target.value;
+          mktDatePreset = 'custom';
+          document.querySelectorAll('.quick-filter-btn[data-target="mkt"]').forEach(b => b.classList.remove('active'));
+          mktCurrentPage = 1;
+          renderMktSubscribersTable();
+        });
+      }
+
+      document.querySelectorAll('.quick-filter-btn[data-target="mkt"]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.quick-filter-btn[data-target="mkt"]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          mktDatePreset = btn.dataset.range;
+          if (mktDateFromInput) mktDateFromInput.value = '';
+          if (mktDateToInput) mktDateToInput.value = '';
+          mktDateFrom = '';
+          mktDateTo = '';
+          mktCurrentPage = 1;
+          renderMktSubscribersTable();
+        });
+      });
+
+      const mktClearBtn = document.getElementById('mkt-clear-filter');
+      if (mktClearBtn) {
+        mktClearBtn.addEventListener('click', () => {
+          mktSearchQuery = '';
+          mktDateFrom = '';
+          mktDateTo = '';
+          mktDatePreset = 'all';
+          if (mktSearchInput) mktSearchInput.value = '';
+          if (mktDateFromInput) mktDateFromInput.value = '';
+          if (mktDateToInput) mktDateToInput.value = '';
+          document.querySelectorAll('.quick-filter-btn[data-target="mkt"]').forEach(b => {
+            b.classList.toggle('active', b.dataset.range === 'all');
+          });
+          mktCurrentPage = 1;
+          renderMktSubscribersTable();
+        });
+      }
+
+      const mktPerPageSelect = document.getElementById('mkt-per-page');
+      if (mktPerPageSelect) {
+        mktPerPageSelect.addEventListener('change', (e) => {
+          mktPerPage = Number(e.target.value) || 10;
+          mktCurrentPage = 1;
+          renderMktSubscribersTable();
+        });
+      }
+
+      const mktPrevBtn = document.getElementById('mkt-page-prev');
+      if (mktPrevBtn) {
+        mktPrevBtn.addEventListener('click', () => {
+          if (mktCurrentPage > 1) {
+            mktCurrentPage--;
+            renderMktSubscribersTable();
+          }
+        });
+      }
+
+      const mktNextBtn = document.getElementById('mkt-page-next');
+      if (mktNextBtn) {
+        mktNextBtn.addEventListener('click', () => {
+          mktCurrentPage++;
+          renderMktSubscribersTable();
+        });
+      }
+
+      // ==========================================
+      // DIRECT EMAIL BUTTON HANDLER
+      // ==========================================
+      window.openDirectEmail = function (email) {
+        if (!email) return;
+        const cleanEmail = email.toLowerCase().trim();
+
+        // 1. Switch to Marketing Tab
+        switchTab('tab-marketing');
+
+        // 2. Set Audience to 'selected'
+        const radio = document.querySelector('input[name="mkt-audience-type"][value="selected"]');
+        if (radio) {
+          radio.checked = true;
+          mktAudienceType = 'selected';
+        }
+
+        // 3. Clear existing selections and target this single email
+        mktSelectedEmails.clear();
+        mktSelectedEmails.add(cleanEmail);
+
+        // 4. Update UI
+        renderMktSubscribersTable();
+        updateAudienceDisplay();
+
+        // 5. Scroll to compose form & focus subject
+        const subjectInput = document.getElementById('email-subject');
+        if (subjectInput) {
+          subjectInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => subjectInput.focus(), 300);
+        }
+
+        showToast(`Targeted 1 subscriber: ${cleanEmail}`);
+      };
+
+      // Export CSV
+      window.exportSubscribersCSV = function () {
+        window.open(`${API_BASE}/subscribers/export?token=${token}`, '_blank');
+      };
+
+      // Delete Subscriber
+      window.deleteSubscriber = async function (id) {
+        if (!confirm('Remove this subscriber from the list?')) return;
+        try {
+          const res = await fetch(`${API_BASE}/subscribers/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+          });
+          if (res.ok) {
+            showToast('Subscriber removed');
+            await fetchSubscribers();
+          }
+        } catch (err) {
+          showToast('Failed to remove subscriber', 'error');
+        }
+      };
+
+      // Fetch Settings (Google Drive Link & SMTP)
+      async function fetchSettings() {
+        try {
+          const res = await fetch(`${API_BASE}/settings`, {
+            headers: getAuthHeaders(),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.googleDriveLink) {
+              document.getElementById('drive-link-input').value = data.googleDriveLink;
+              document.getElementById('test-drive-link').href = data.googleDriveLink;
+            }
+            if (data.smtpSettings) {
+              document.getElementById('smtp-host').value = data.smtpSettings.host || '';
+              document.getElementById('smtp-port').value = data.smtpSettings.port || 465;
+              document.getElementById('smtp-user').value = data.smtpSettings.user || '';
+              document.getElementById('smtp-pass').value = data.smtpSettings.pass || '';
+            }
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      // Save Drive Link Form
+      document.getElementById('drive-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const link = document.getElementById('drive-link-input').value.trim();
+
+        try {
+          const res = await fetch(`${API_BASE}/settings`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ googleDriveLink: link }),
+          });
+
+          if (res.ok) {
+            document.getElementById('test-drive-link').href = link;
+            showToast('Google Drive link saved successfully!');
+          } else {
+            showToast('Failed to save Drive link', 'error');
+          }
+        } catch (err) {
+          showToast('Settings update error', 'error');
+        }
+      });
+
+      // Save SMTP Form
+      document.getElementById('smtp-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const smtpSettings = {
+          host: document.getElementById('smtp-host').value.trim(),
+          port: Number(document.getElementById('smtp-port').value),
+          user: document.getElementById('smtp-user').value.trim(),
+          pass: document.getElementById('smtp-pass').value.trim(),
+          from: `ChibiFlex <${document.getElementById('smtp-user').value.trim()}>`,
+        };
+
+        try {
+          const res = await fetch(`${API_BASE}/settings`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ smtpSettings }),
+          });
+
+          if (res.ok) {
+            showToast('SMTP settings saved successfully!');
+          } else {
+            showToast('Failed to save SMTP settings', 'error');
+          }
+        } catch (err) {
+          showToast('SMTP update error', 'error');
+        }
+      });
+
+      // Send Test Email
+      document.getElementById('send-test-btn').addEventListener('click', async () => {
+        const testEmail = prompt('Enter your email address to receive the test broadcast:');
+        if (!testEmail || !testEmail.includes('@')) return;
+
+        const subject = document.getElementById('email-subject').value.trim();
+        const htmlContent = document.getElementById('email-body').value.trim();
+
+        if (!subject || !htmlContent) {
+          showToast('Please enter both subject and message body first', 'error');
+          return;
+        }
+
+        const btn = document.getElementById('send-test-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending test...';
+
+        try {
+          const res = await fetch(`${API_BASE}/admin/send-email`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+              subject,
+              htmlContent,
+              isTest: true,
+              testEmail,
+            }),
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            showToast(data.message || 'Test email sent successfully!');
+          } else {
+            showToast(data.error || 'Failed to send test email', 'error');
+          }
+        } catch (err) {
+          showToast('Test email request error', 'error');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-vial"></i> <span>Send Test Email</span>';
+        }
+      });
+
+      // Broadcast Form Submit (All vs Selected)
+      document.getElementById('broadcast-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const subject = document.getElementById('email-subject').value.trim();
+        const htmlContent = document.getElementById('email-body').value.trim();
+
+        if (!subject || !htmlContent) {
+          showToast('Please enter both subject line and email content', 'error');
+          return;
+        }
+
+        let recipientEmails = null;
+        let confirmMsg = '';
+
+        if (mktAudienceType === 'selected') {
+          if (mktSelectedEmails.size === 0) {
+            showToast('Please select at least one subscriber from the table above!', 'error');
+            const picker = document.getElementById('mkt-subscribers-picker');
+            if (picker) picker.scrollIntoView({ behavior: 'smooth' });
+            return;
+          }
+          recipientEmails = Array.from(mktSelectedEmails);
+          confirmMsg = `Are you sure you want to send this email to ${recipientEmails.length} selected subscriber(s)?`;
+        } else {
+          if (allSubscribers.length === 0) {
+            showToast('No subscribers in database to broadcast to', 'error');
+            return;
+          }
+          confirmMsg = `Are you sure you want to broadcast this email to ALL ${allSubscribers.length} subscribers?`;
+        }
+
+        if (!confirm(confirmMsg)) return;
+
+        const btn = document.getElementById('broadcast-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending emails...';
+
+        try {
+          const res = await fetch(`${API_BASE}/admin/send-email`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+              subject,
+              htmlContent,
+              isTest: false,
+              recipientEmails,
+            }),
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            showToast(data.message || 'Campaign sent successfully!');
+          } else {
+            showToast(data.error || 'Failed to send campaign', 'error');
+          }
+        } catch (err) {
+          showToast('Broadcast request failed', 'error');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span id="broadcast-btn-text"></span>`;
+          updateAudienceDisplay();
+        }
+      });
+    </script>
+  </body>
+</html>
