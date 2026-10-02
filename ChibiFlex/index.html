@@ -795,14 +795,31 @@
 
       .about-image-wrapper {
         flex: 1;
-        min-width: 320px;
-        height: 480px;
+        width: 100%;
+        max-width: 480px;
         position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .about-img {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        z-index: 2;
+        display: block;
       }
 
       .about-image {
         width: 100%;
         height: 100%;
+        min-height: 300px;
         background-image: url("Resources/Site_Images/About_Image/1.webp");
         background-size: cover;
         background-position: center;
@@ -1341,7 +1358,9 @@
 
         .about-image-wrapper {
           width: 100%;
-          height: 400px;
+          max-width: 420px;
+          height: auto;
+          margin: 0 auto;
         }
       }
 
@@ -1418,8 +1437,10 @@
         }
 
         .about-image-wrapper {
-          min-width: 100%;
-          height: 300px;
+          width: 100%;
+          max-width: 360px;
+          height: auto;
+          margin: 0 auto;
         }
 
         .swiper-container {
@@ -1877,7 +1898,12 @@
             </p>
           </div>
           <div class="about-image-wrapper">
-            <div class="about-image"></div>
+            <img
+              src="./Resources/Site_Images/About_Image/1.webp"
+              alt="About Chibi Flex - 3D Printed Flexi Toys"
+              class="about-img"
+              loading="lazy"
+            />
             <div class="about-glow"></div>
           </div>
         </div>
