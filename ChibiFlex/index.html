@@ -1095,11 +1095,23 @@
         box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 50px rgba(236, 72, 153, 0.25);
         max-width: 520px;
         width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         position: relative;
         padding: 2.5rem 2.2rem;
-        overflow: hidden;
         transform: scale(0.92) translateY(20px);
         transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        box-sizing: border-box;
+      }
+
+      .popup-modal::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .popup-modal::-webkit-scrollbar-thumb {
+        background: rgba(236, 72, 153, 0.3);
+        border-radius: 10px;
       }
 
       .popup-overlay.show .popup-modal {
@@ -1442,11 +1454,95 @@
           width: 42px;
           height: 42px;
         }
+
+        /* Popup Modal Mobile Responsiveness */
+        .popup-overlay {
+          padding: 0.75rem;
+          align-items: center;
+        }
+
+        .popup-modal {
+          padding: 2.2rem 1.25rem 1.4rem;
+          border-radius: 20px;
+          max-height: 90vh;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .popup-close-btn {
+          top: 10px;
+          right: 10px;
+          width: 32px;
+          height: 32px;
+          font-size: 0.95rem;
+        }
+
+        .popup-badge {
+          font-size: 0.72rem;
+          padding: 4px 10px;
+          margin-bottom: 0.6rem;
+        }
+
+        .popup-title {
+          font-size: 1.35rem;
+          line-height: 1.25;
+          margin-bottom: 0.6rem;
+        }
+
+        .popup-desc {
+          font-size: 0.88rem;
+          line-height: 1.5;
+          margin-bottom: 1.2rem;
+        }
+
+        .popup-input-wrapper {
+          width: 100%;
+        }
+
+        .popup-input {
+          padding: 12px 14px 12px 42px;
+          font-size: 0.9rem;
+        }
+
+        .popup-input-wrapper i {
+          left: 14px;
+          font-size: 1rem;
+        }
+
+        .popup-submit-btn {
+          padding: 12px 16px;
+          font-size: 0.95rem;
+        }
+
+        .popup-footer-text {
+          font-size: 0.72rem;
+          margin-top: 0.75rem;
+          line-height: 1.4;
+          flex-wrap: wrap;
+        }
+
+        .otp-input-field {
+          letter-spacing: 4px;
+          font-size: 1.15rem;
+        }
       }
 
       @media (max-width: 420px) {
         .portfolio-grid {
           gap: 0.75rem;
+        }
+
+        .popup-modal {
+          padding: 2rem 1rem 1.2rem;
+        }
+
+        .popup-title {
+          font-size: 1.2rem;
+        }
+
+        .popup-submit-btn {
+          font-size: 0.88rem;
+          padding: 11px 14px;
         }
       }
     </style>
@@ -1538,7 +1634,7 @@
           <div class="hero-features">
             <div class="feature-item">
               <span class="feature-icon"><i class="fa-solid fa-circle-check"></i></span>
-              <span class="feature-text"><strong>7+ new models every month</strong> exclusive models included</span>
+              <span class="feature-text"><strong>5+ new models every month</strong> exclusive models included</span>
             </div>
             <div class="feature-item">
               <span class="feature-icon"><i class="fa-solid fa-circle-check"></i></span>
@@ -2897,7 +2993,7 @@
           <div id="popup-otp-error" class="otp-alert error" style="display: none; margin-top: 12px;"></div>
           <div id="popup-otp-success" class="otp-alert success" style="display: none; margin-top: 12px;"></div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; font-size: 0.85rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; font-size: 0.85rem; flex-wrap: wrap; gap: 8px;">
             <button type="button" id="popup-otp-resend-btn" style="background: none; border: none; color: var(--accent-cyan); cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600;">
               <i class="fa-solid fa-rotate-right"></i> <span id="popup-otp-resend-text">Resend Code</span>
             </button>
