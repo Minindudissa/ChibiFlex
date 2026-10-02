@@ -118,7 +118,7 @@ async function initDefaults() {
     { name: 'Public Releases', slug: 'public-releases', order: 1, description: 'All public flexi models available to everyone' },
     { name: 'Exclusive Designs', slug: 'exclusives', order: 2, description: 'Retired and exclusive member-only designs' },
     { name: 'Patreon Welcome Pack', slug: 'welcome-pack', order: 3, description: 'Models granted to new Patreon subscribers' },
-    { name: 'Free Models', slug: 'free-models', order: 4, description: 'Complimentary STL designs for newcomers' },
+    { name: 'Free Models', slug: 'free-models', order: 4, description: 'Complimentary 3MF designs for newcomers' },
   ];
 
   for (const cat of officialCategories) {
