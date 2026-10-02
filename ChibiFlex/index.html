@@ -1095,23 +1095,12 @@
         box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 50px rgba(236, 72, 153, 0.25);
         max-width: 520px;
         width: 100%;
-        max-height: 90vh;
-        overflow-x: hidden !important;
-        overflow-y: auto;
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* IE and Edge */
-        -webkit-overflow-scrolling: touch;
+        overflow: hidden !important;
         position: relative;
-        padding: 2.5rem 2.2rem;
+        padding: 2.3rem 2.2rem 1.8rem;
         transform: scale(0.92) translateY(20px);
         transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         box-sizing: border-box;
-      }
-
-      .popup-modal::-webkit-scrollbar {
-        display: none; /* Chrome, Safari, Opera */
-        width: 0;
-        height: 0;
       }
 
       .popup-overlay.show .popup-modal {
@@ -1462,12 +1451,11 @@
         }
 
         .popup-modal {
-          padding: 2.2rem 1.25rem 1.4rem;
+          padding: 2rem 1.3rem 1.4rem;
           border-radius: 20px;
-          max-height: 90vh;
           width: 100%;
           box-sizing: border-box;
-          overflow-x: hidden !important;
+          overflow: hidden !important;
         }
 
         .popup-close-btn {
@@ -1534,8 +1522,8 @@
         }
 
         .popup-modal {
-          padding: 2rem 1rem 1.2rem;
-          overflow-x: hidden !important;
+          padding: 1.8rem 1rem 1.2rem;
+          overflow: hidden !important;
         }
 
         .popup-title {
