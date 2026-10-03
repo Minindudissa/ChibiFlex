@@ -284,7 +284,7 @@ app.get('/api/models', async (req, res) => {
       filter.category = category;
     }
 
-    const models = await ModelItem.find(filter).sort({ order: 1, createdAt: -1 });
+    const models = await ModelItem.find(filter).sort({ createdAt: -1 });
     res.json(models);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch models' });
@@ -729,6 +729,10 @@ app.put('/api/models/:id', requireAdmin, async (req, res) => {
     if (order !== undefined) updateFields.order = Number(order);
     if (isCurrentMonthly !== undefined) {
       updateFields.isCurrentMonthly = isCurrentMonthly === true || isCurrentMonthly === 'true';
+      if (updateFields.isCurrentMonthly && !releaseMonth) {
+        const activeSetting = await Setting.findOne({ key: 'activeMonthlyRelease' });
+        updateFields.releaseMonth = activeSetting?.value?.title || "This Month's Releases";
+      }
     }
     if (releaseMonth !== undefined) updateFields.releaseMonth = releaseMonth;
 
@@ -780,7 +784,7 @@ app.get('/api/admin/monthly-release', requireAdmin, async (req, res) => {
       year: new Date().getFullYear(),
     };
 
-    const currentModels = await ModelItem.find({ isCurrentMonthly: true }).sort({ order: 1, createdAt: -1 });
+    const currentModels = await ModelItem.find({ isCurrentMonthly: true }).sort({ createdAt: -1 });
     const publicCount = currentModels.filter(m => m.category === 'public-releases').length;
     const exclusiveCount = currentModels.filter(m => m.category === 'exclusives').length;
     const welcomeCount = currentModels.filter(m => m.category === 'welcome-pack').length;
