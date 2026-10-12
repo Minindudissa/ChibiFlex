@@ -519,6 +519,25 @@
         font-size: 1.85rem;
         font-weight: 800;
         margin-bottom: 1.5rem;
+        min-height: 2.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .gallery-title-loader {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+
+      .gallery-title-loader i {
+        color: var(--accent-pink);
+        font-size: 1.05rem;
       }
 
       .swiper-container {
@@ -1687,7 +1706,21 @@
           <div class="gallery-badge">
             <i class="fa-solid fa-sparkles"></i> Monthly Spotlight
           </div>
-          <h3 class="gallery-title" id="monthly-gallery-title">April Releases</h3>
+          <h3 class="gallery-title" id="monthly-gallery-title">
+            <span class="gallery-title-loader">
+              <i class="fa-solid fa-circle-notch fa-spin"></i> Loading releases...
+            </span>
+          </h3>
+          <script>
+            (function() {
+              try {
+                var cached = localStorage.getItem('chibiflex_monthly_title');
+                if (cached) {
+                  document.getElementById('monthly-gallery-title').textContent = cached;
+                }
+              } catch(e) {}
+            })();
+          </script>
           <div class="swiper-container">
             <div class="swiper-wrapper">
               <!-- Slides will be dynamically added here -->
@@ -2095,10 +2128,16 @@
             const settingsData = await settingsRes.json();
             if (settingsData?.activeMonthlyRelease?.title && titleEl) {
               titleEl.textContent = settingsData.activeMonthlyRelease.title;
+              try {
+                localStorage.setItem('chibiflex_monthly_title', settingsData.activeMonthlyRelease.title);
+              } catch (err) {}
             }
           }
         } catch (e) {
           console.log('Using default monthly release title');
+          if (titleEl && titleEl.querySelector('.gallery-title-loader')) {
+            titleEl.textContent = "This Month's Releases";
+          }
         }
 
         // 2. Fetch Models Marked for This Month's Release (Combining Public & Exclusive designs)
