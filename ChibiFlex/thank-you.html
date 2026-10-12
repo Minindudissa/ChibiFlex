@@ -466,7 +466,8 @@
         <a
           href="https://www.patreon.com/ChibiFlex"
           target="_blank"
-          class="btn-patreon"
+          class="btn-patreon click-patreon-btn"
+          id="click-patreon-btn"
         >
           <i class="fa-brands fa-patreon" style="font-size: 1.2rem;"></i>
           <span>Join ChibiFlex on Patreon</span>
@@ -519,6 +520,16 @@
       }
 
       setupDriveLink();
+
+      // Patreon Meta Pixel Click Tracking
+      const patreonBtn = document.getElementById('click-patreon-btn');
+      if (patreonBtn) {
+        patreonBtn.addEventListener('click', function () {
+          if (typeof fbq === 'function') {
+            fbq('track', 'clickPatreonButton');
+          }
+        });
+      }
     </script>
   </body>
 </html>
