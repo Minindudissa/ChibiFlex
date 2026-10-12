@@ -523,6 +523,7 @@
       if (patreonBtn) {
         patreonBtn.addEventListener('click', function () {
           if (typeof fbq === 'function') {
+            fbq('trackCustom', 'clickPatreonButton');
             fbq('track', 'clickPatreonButton');
           }
         });
