@@ -2085,10 +2085,9 @@
           );
           patreonButtons.forEach(function (btn) {
             btn.addEventListener('click', function () {
-              // Meta Pixel Event (fires both track and trackCustom for full Meta compatibility)
+              // Meta Pixel Custom Event
               if (typeof fbq === 'function') {
                 fbq('trackCustom', 'clickPatreonButton');
-                fbq('track', 'clickPatreonButton');
               }
             });
           });

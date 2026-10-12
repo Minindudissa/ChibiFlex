@@ -518,13 +518,12 @@
 
       setupDriveLink();
 
-      // Patreon Meta Pixel Click Tracking
+      // Patreon Meta Pixel Custom Click Tracking
       const patreonBtn = document.getElementById('click-patreon-btn');
       if (patreonBtn) {
         patreonBtn.addEventListener('click', function () {
           if (typeof fbq === 'function') {
             fbq('trackCustom', 'clickPatreonButton');
-            fbq('track', 'clickPatreonButton');
           }
         });
       }
