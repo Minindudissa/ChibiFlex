@@ -1689,8 +1689,7 @@
             <a
               target="_blank"
               href="https://www.patreon.com/ChibiFlex/membership"
-              class="btn btn-primary click-patreon-btn"
-              id="click-patreon-btn"
+              class="btn btn-primary"
             >
               <span>Join Now</span>
               <i class="fa-solid fa-arrow-right"></i>
@@ -1965,8 +1964,7 @@
             <a
               href="https://www.patreon.com/ChibiFlex"
               target="_blank"
-              class="social-btn patreon click-patreon-btn"
-              id="click-patreon-btn-footer"
+              class="social-btn patreon"
               aria-label="Patreon"
             >
               <i class="fab fa-patreon"></i>
@@ -2076,30 +2074,6 @@
         });
     </script>
 
-    <!-- Patreon Meta Pixel Click Tracking -->
-    <script>
-      (function () {
-        function trackPatreonClicks() {
-          const patreonButtons = document.querySelectorAll(
-            '#click-patreon-btn, #click-patreon-btn-footer, .click-patreon-btn'
-          );
-          patreonButtons.forEach(function (btn) {
-            btn.addEventListener('click', function () {
-              // Meta Pixel Custom Event
-              if (typeof fbq === 'function') {
-                fbq('trackCustom', 'clickPatreonButton');
-              }
-            });
-          });
-        }
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', trackPatreonClicks);
-        } else {
-          trackPatreonClicks();
-        }
-      })();
-    </script>
 
     <!-- Monthly Releases Swiper -->
     <script>
