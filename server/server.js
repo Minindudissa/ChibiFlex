@@ -1108,15 +1108,43 @@ app.put('/api/admin/monthly-release/toggle-model/:id', requireAdmin, async (req,
 // 4. ADMIN SUBSCRIBER MANAGEMENT
 // -------------------------------------------------------------
 
+async function getAllSubscribersFromDB() {
+  let subscribers = await Subscriber.find().sort({ subscribedAt: -1, createdAt: -1 });
+
+  // Fallback: in case MongoDB Atlas collection was created with different casing like 'Subscribers' or 'subscriber'
+  if ((!subscribers || subscribers.length === 0) && mongoose.connection?.db) {
+    try {
+      const collections = await mongoose.connection.db.listCollections().toArray();
+      const altCol = collections.find((c) => {
+        const lower = c.name.toLowerCase();
+        return lower === 'subscribers' || lower === 'subscriber' || lower === 'leads';
+      });
+      if (altCol && altCol.name !== 'subscribers') {
+        console.log(`[Subscribers] Reading from alternative collection: ${altCol.name}`);
+        subscribers = await mongoose.connection.db
+          .collection(altCol.name)
+          .find()
+          .sort({ subscribedAt: -1, createdAt: -1 })
+          .toArray();
+      }
+    } catch (colErr) {
+      console.warn('Alternative collection lookup error:', colErr);
+    }
+  }
+
+  return subscribers || [];
+}
+
 // List Subscribers
 app.get('/api/subscribers', requireAdmin, async (req, res) => {
   try {
-    const subscribers = await Subscriber.find().sort({ subscribedAt: -1 });
+    const subscribers = await getAllSubscribersFromDB();
     res.json({
       total: subscribers.length,
       subscribers,
     });
   } catch (err) {
+    console.error('Failed to fetch subscribers:', err);
     res.status(500).json({ error: 'Failed to fetch subscribers' });
   }
 });
@@ -1124,10 +1152,11 @@ app.get('/api/subscribers', requireAdmin, async (req, res) => {
 // Export Subscribers to CSV
 app.get('/api/subscribers/export', requireAdmin, async (req, res) => {
   try {
-    const subscribers = await Subscriber.find().sort({ subscribedAt: -1 });
+    const subscribers = await getAllSubscribersFromDB();
     let csv = 'Email,SubscribedAt,Status\n';
     subscribers.forEach((s) => {
-      csv += `"${s.email}","${new Date(s.subscribedAt).toISOString()}","${s.status}"\n`;
+      const dateVal = s.subscribedAt || s.createdAt || new Date();
+      csv += `"${s.email}","${new Date(dateVal).toISOString()}","${s.status || 'active'}"\n`;
     });
 
     res.header('Content-Type', 'text/csv');
@@ -1320,11 +1349,12 @@ app.post('/api/admin/send-email', requireAdmin, async (req, res) => {
         return res.status(400).json({ error: 'No valid recipient email addresses selected.' });
       }
     } else {
-      const subscribers = await Subscriber.find({ status: 'active' });
-      if (subscribers.length === 0) {
+      const subscribers = await getAllSubscribersFromDB();
+      const activeSubs = subscribers.filter((s) => !s.status || s.status === 'active');
+      if (activeSubs.length === 0) {
         return res.status(400).json({ error: 'No active subscribers found to send to.' });
       }
-      targetEmails = subscribers.map((s) => s.email);
+      targetEmails = activeSubs.map((s) => s.email);
     }
 
     let successCount = 0;

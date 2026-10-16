@@ -2682,6 +2682,11 @@
 
       // Date Filtering Helper
       function matchesDateFilter(dateStr, fromStr, toStr, preset) {
+        // If "All Time" preset and no custom dates provided, match all items unconditionally
+        if ((!preset || preset === 'all') && !fromStr && !toStr) {
+          return true;
+        }
+
         if (!dateStr) return false;
         const d = new Date(dateStr);
         if (isNaN(d.getTime())) return false;
@@ -2749,21 +2754,36 @@
           const res = await fetch(`${API_BASE}/subscribers`, {
             headers: getAuthHeaders(),
           });
-          if (res.ok) {
-            const data = await res.json();
-            allSubscribers = data.subscribers || [];
-            document.getElementById('stat-subscribers').textContent = allSubscribers.length;
-            document.getElementById('subscribers-count').textContent = allSubscribers.length;
-            document.getElementById('marketing-recipient-count').textContent = allSubscribers.length;
-            const badgeAll = document.getElementById('badge-all-count');
-            if (badgeAll) badgeAll.textContent = `${allSubscribers.length} Recipients`;
 
-            renderSubscribersTab();
-            renderMktSubscribersTable();
-            updateAudienceDisplay();
+          if (res.status === 401) {
+            console.warn('Session expired or unauthorized');
+            showLogin();
+            showToast('Session expired. Please log in again.', 'warning');
+            return;
           }
+
+          if (!res.ok) {
+            console.error('Failed to fetch subscribers:', res.status);
+            showToast(`Error loading subscribers (${res.status})`, 'error');
+            renderSubscribersTab();
+            return;
+          }
+
+          const data = await res.json();
+          allSubscribers = data.subscribers || [];
+          document.getElementById('stat-subscribers').textContent = allSubscribers.length;
+          document.getElementById('subscribers-count').textContent = allSubscribers.length;
+          document.getElementById('marketing-recipient-count').textContent = allSubscribers.length;
+          const badgeAll = document.getElementById('badge-all-count');
+          if (badgeAll) badgeAll.textContent = `${allSubscribers.length} Recipients`;
+
+          renderSubscribersTab();
+          renderMktSubscribersTable();
+          updateAudienceDisplay();
         } catch (err) {
           console.error(err);
+          showToast('Failed to connect to API for subscribers', 'error');
+          renderSubscribersTab();
         }
       }
 
@@ -2775,7 +2795,8 @@
           if (subsSearchQuery && !s.email.toLowerCase().includes(subsSearchQuery)) {
             return false;
           }
-          return matchesDateFilter(s.subscribedAt, subsDateFrom, subsDateTo, subsDatePreset);
+          const itemDate = s.subscribedAt || s.createdAt;
+          return matchesDateFilter(itemDate, subsDateFrom, subsDateTo, subsDatePreset);
         });
       }
 
@@ -2797,12 +2818,13 @@
         } else {
           slice.forEach((sub, idx) => {
             const tr = document.createElement('tr');
+            const itemDate = sub.subscribedAt || sub.createdAt || '';
             tr.innerHTML = `
               <td>${startIndex + idx + 1}</td>
               <td><strong>${escapeHtml(sub.email)}</strong></td>
-              <td title="${sub.subscribedAt || ''}">
+              <td title="${itemDate}">
                 <i class="fa-regular fa-clock" style="color: var(--accent-pink); margin-right: 6px; font-size: 0.8rem;"></i>
-                ${formatDateTime(sub.subscribedAt)}
+                ${formatDateTime(itemDate)}
               </td>
               <td><span class="model-badge">${escapeHtml(sub.source || 'free-model')}</span></td>
               <td><span class="model-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);">${escapeHtml(sub.status || 'active')}</span></td>
@@ -2949,7 +2971,8 @@
           if (mktSearchQuery && !s.email.toLowerCase().includes(mktSearchQuery)) {
             return false;
           }
-          return matchesDateFilter(s.subscribedAt, mktDateFrom, mktDateTo, mktDatePreset);
+          const itemDate = s.subscribedAt || s.createdAt;
+          return matchesDateFilter(itemDate, mktDateFrom, mktDateTo, mktDatePreset);
         });
       }
 
@@ -2972,6 +2995,7 @@
           slice.forEach((sub, idx) => {
             const emailKey = (sub.email || '').toLowerCase().trim();
             const isChecked = mktSelectedEmails.has(emailKey);
+            const itemDate = sub.subscribedAt || sub.createdAt || '';
 
             const tr = document.createElement('tr');
             if (isChecked) tr.classList.add('row-selected');
@@ -2982,9 +3006,9 @@
               </td>
               <td>${startIndex + idx + 1}</td>
               <td><strong>${escapeHtml(sub.email)}</strong></td>
-              <td title="${sub.subscribedAt || ''}">
+              <td title="${itemDate}">
                 <i class="fa-regular fa-clock" style="color: var(--accent-pink); margin-right: 6px; font-size: 0.8rem;"></i>
-                ${formatDateTime(sub.subscribedAt)}
+                ${formatDateTime(itemDate)}
               </td>
               <td><span class="model-badge">${escapeHtml(sub.source || 'free-model')}</span></td>
               <td><span class="model-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);">${escapeHtml(sub.status || 'active')}</span></td>
@@ -3321,6 +3345,11 @@
           const res = await fetch(`${API_BASE}/settings`, {
             headers: getAuthHeaders(),
           });
+          if (res.status === 401) {
+            showLogin();
+            showToast('Session expired. Please log in again.', 'warning');
+            return;
+          }
           if (res.ok) {
             const data = await res.json();
             if (data.googleDriveLink) {
