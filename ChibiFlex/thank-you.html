@@ -432,6 +432,19 @@
             <i class="fa-solid fa-shield-halved"></i> 100% Free Direct Access · Instant 3MF Downloads · No Wait
           </p>
         </div>
+
+        <!-- Automated Email Sent Banner -->
+        <div id="email-confirmation-banner" style="margin-top: 1.6rem; background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.25); border-radius: var(--radius-md); padding: 14px 20px; text-align: left; display: flex; align-items: center; gap: 14px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(6, 182, 212, 0.18); color: var(--accent-cyan); font-size: 1.15rem; flex-shrink: 0;">
+            <i class="fa-solid fa-envelope-circle-check"></i>
+          </span>
+          <div style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.5;">
+            <strong style="color: #ffffff; display: block; font-size: 0.96rem; margin-bottom: 2px;">
+              Check your inbox! ✉️
+            </strong>
+            A copy of this download link & printing tips has also been sent to <span id="thank-you-email-display" style="color: var(--accent-cyan); font-weight: 600;">your email</span> so you'll never lose it.
+          </div>
+        </div>
       </section>
 
       <!-- Patreon Exclusive Upsell -->
@@ -480,12 +493,21 @@
     <script>
       document.getElementById('year').textContent = new Date().getFullYear();
 
-      // Resolve Google Drive Link dynamically
+      // Resolve Google Drive Link & Subscriber Email dynamically
       async function setupDriveLink() {
         const linkEl = document.getElementById('thank-you-drive-link');
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Display user email if available
+        const userEmail = urlParams.get('email') || localStorage.getItem('chibiflex_subscriber_email');
+        if (userEmail) {
+          const emailDisplay = document.getElementById('thank-you-email-display');
+          if (emailDisplay) {
+            emailDisplay.textContent = userEmail;
+          }
+        }
         
         // 1. Check URL parameters (?drive=...)
-        const urlParams = new URLSearchParams(window.location.search);
         const driveParam = urlParams.get('drive');
         if (driveParam) {
           linkEl.href = driveParam;

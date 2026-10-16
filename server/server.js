@@ -40,11 +40,18 @@ const upload = multer({
 
 // Admin Auth Middleware
 const requireAdmin = (req, res, next) => {
+  let token = null;
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (req.query && req.query.token) {
+    token = req.query.token;
+  }
+
+  if (!token) {
     return res.status(401).json({ error: 'Unauthorized. Please login.' });
   }
-  const token = authHeader.split(' ')[1];
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.admin = decoded;
@@ -85,6 +92,18 @@ async function initDefaults() {
         user: '',
         pass: '',
         from: 'ChibiFlex <noreply@chibiflex.com>',
+      },
+    });
+  }
+
+  const thankYouSetting = await Setting.findOne({ key: 'thankYouEmailSettings' });
+  if (!thankYouSetting) {
+    await Setting.create({
+      key: 'thankYouEmailSettings',
+      value: {
+        enabled: true,
+        subject: '🎁 Your Free Chibi Flex 3D Models Are Ready To Download!',
+        customNote: '',
       },
     });
   }
@@ -443,6 +462,186 @@ function getOtpHtmlEmail(otp) {
   `;
 }
 
+function getThankYouHtmlEmail(driveLink, customNote = '') {
+  const currentYear = new Date().getFullYear();
+  const safeDriveLink = driveLink || 'https://drive.google.com';
+
+  const customNoteHtml = customNote && customNote.trim()
+    ? `
+      <div style="background: rgba(0, 210, 255, 0.08); border-left: 4px solid #00d2ff; padding: 14px 18px; border-radius: 8px; margin: 20px 0; text-align: left;">
+        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #e2e8f0; font-style: italic;">
+          "${customNote.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}"
+        </p>
+      </div>
+    `
+    : '';
+
+  return `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You for Downloading Chibi Flex Free Models</title>
+  </head>
+  <body style="margin: 0; padding: 0; background-color: #0b0c10; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ffffff;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #0b0c10; padding: 40px 15px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" style="max-width: 580px; background: linear-gradient(145deg, #151722, #0d0f17); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);" cellspacing="0" cellpadding="0" border="0">
+            <!-- Header -->
+            <tr>
+              <td style="padding: 35px 35px 22px 35px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff;">
+                  🧸 <span style="background: linear-gradient(135deg, #00d2ff, #3a7bd5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Chibi Flex</span>
+                </h1>
+                <p style="margin: 6px 0 0 0; font-size: 13px; color: #94a3b8; letter-spacing: 0.5px; text-transform: uppercase;">Cute 3D Printable Flexi Models</p>
+              </td>
+            </tr>
+
+            <!-- Main Content -->
+            <tr>
+              <td style="padding: 35px 35px 25px 35px; text-align: center;">
+                <div style="display: inline-block; width: 56px; height: 56px; line-height: 56px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 28px; margin-bottom: 18px;">
+                  🎁
+                </div>
+                <h2 style="margin: 0 0 14px 0; font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">
+                  Thank You for Downloading!
+                </h2>
+                <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #cbd5e1;">
+                  Welcome to the <strong>Chibi Flex</strong> family! Your complimentary articulated 3D printable models are ready to download via Google Drive.
+                </p>
+
+                ${customNoteHtml}
+
+                <!-- Download CTA Button -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 28px auto 16px auto;">
+                  <tr>
+                    <td align="center" style="border-radius: 14px; background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%); box-shadow: 0 10px 25px rgba(0, 210, 255, 0.35);">
+                      <a href="${safeDriveLink}" target="_blank" style="padding: 16px 36px; border-radius: 14px; font-size: 16px; font-weight: 800; color: #ffffff; text-decoration: none; display: inline-block; letter-spacing: 0.3px;">
+                        📥 Download Free 3D Models (Google Drive) &rarr;
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+
+                <p style="margin: 0 0 28px 0; font-size: 12px; color: #94a3b8; word-break: break-all; line-height: 1.5;">
+                  Direct link: <a href="${safeDriveLink}" target="_blank" style="color: #00d2ff; text-decoration: underline;">${safeDriveLink}</a>
+                </p>
+
+                <!-- Printing Guide & What's Included -->
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 20px 22px; text-align: left; margin-bottom: 28px;">
+                  <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.8px;">
+                    💡 What's Inside & Printing Tips
+                  </h3>
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                    <tr>
+                      <td style="padding: 5px 0; font-size: 13.5px; color: #e2e8f0; line-height: 1.5;">
+                        🧩 <strong>Print-in-Place Articulation:</strong> All joints and hinges print ready-assembled. Zero gluing or hardware required!
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 5px 0; font-size: 13.5px; color: #e2e8f0; line-height: 1.5;">
+                        🎨 <strong>Multi-Color 3MF Files:</strong> Pre-colored and sliced for Bambu Studio, OrcaSlicer, or PrusaSlicer.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 5px 0; font-size: 13.5px; color: #e2e8f0; line-height: 1.5;">
+                        ⚙️ <strong>Recommended Slicer Settings:</strong> 0.16mm - 0.20mm layer height, 2–3 walls, 15% gyroid infill. No supports needed.
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+
+                <!-- Patreon Upsell Banner -->
+                <div style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 16px; padding: 24px; text-align: center;">
+                  <span style="font-size: 12px; font-weight: 800; color: #ec4899; text-transform: uppercase; letter-spacing: 1px;">Join Our Club</span>
+                  <h3 style="margin: 6px 0 10px 0; font-size: 18px; font-weight: 800; color: #f8fafc;">
+                    Want 5+ New Exclusive Models Monthly? ✨
+                  </h3>
+                  <p style="margin: 0 0 18px 0; font-size: 13.5px; color: #cbd5e1; line-height: 1.5;">
+                    Support Chibi Flex on Patreon to unlock our entire Welcome Pack, monthly member exclusives, design voting, and commercial licensing to sell 3D prints!
+                  </p>
+                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+                    <tr>
+                      <td align="center" style="border-radius: 10px; background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);">
+                        <a href="https://www.patreon.com/ChibiFlex" target="_blank" style="padding: 12px 26px; border-radius: 10px; font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; display: inline-block;">
+                          🧸 Join ChibiFlex on Patreon &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="padding: 24px 35px; background-color: rgba(0, 0, 0, 0.35); border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center;">
+                <p style="margin: 0 0 8px 0; font-size: 13px; color: #94a3b8; font-weight: 600;">
+                  Happy 3D Printing! ❤️ The Chibi Flex Team
+                </p>
+                <p style="margin: 0 0 8px 0; font-size: 11.5px; color: #64748b; line-height: 1.5;">
+                  You received this email because you requested the free 3D models download on <a href="https://chibiflex.com" style="color: #64748b; text-decoration: underline;">chibiflex.com</a>.
+                </p>
+                <p style="margin: 0; font-size: 11.5px; color: #475569;">
+                  &copy; ${currentYear} Chibi Flex. All rights reserved.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `;
+}
+
+async function sendThankYouEmail(toEmail, driveLink) {
+  if (!toEmail) return { success: false, reason: 'no-email' };
+  try {
+    const thankYouSetting = await Setting.findOne({ key: 'thankYouEmailSettings' });
+    const settings = thankYouSetting?.value || {
+      enabled: true,
+      subject: '🎁 Your Free Chibi Flex 3D Models Are Ready To Download!',
+      customNote: '',
+    };
+
+    if (settings.enabled === false) {
+      console.log(`[Thank You Email] Disabled in settings; skipping dispatch to ${toEmail}.`);
+      return { success: false, reason: 'disabled' };
+    }
+
+    const { transporter, from } = await getMailTransporter();
+    let finalDriveLink = driveLink;
+    if (!finalDriveLink) {
+      const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
+      finalDriveLink = driveSetting ? driveSetting.value : 'https://drive.google.com';
+    }
+
+    const subject = settings.subject && settings.subject.trim()
+      ? settings.subject.trim()
+      : '🎁 Your Free Chibi Flex 3D Models Are Ready To Download!';
+
+    const html = getThankYouHtmlEmail(finalDriveLink, settings.customNote);
+
+    const info = await transporter.sendMail({
+      from,
+      to: toEmail,
+      subject,
+      html,
+    });
+
+    console.log(`[Thank You Email] Successfully sent to ${toEmail}. Message ID: ${info.messageId}`);
+    return { success: true, messageId: info.messageId };
+  } catch (err) {
+    console.error(`[Thank You Email] Failed to send to ${toEmail}:`, err.message || err);
+    return { success: false, error: err.message };
+  }
+}
+
 // -------------------------------------------------------------
 // 1. SUBSCRIBE & OTP VERIFICATION ENDPOINTS
 // -------------------------------------------------------------
@@ -469,6 +668,11 @@ app.post('/api/subscribe', async (req, res) => {
       // Returning active subscriber -> Instant unlock with ZERO OTP friction!
       const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
       const driveLink = driveSetting ? driveSetting.value : '';
+
+      // Automatically send Thank You Email with download link to returning subscriber as well
+      sendThankYouEmail(cleanEmail, driveLink).catch(err => {
+        console.error('Auto Thank You Email error on returning subscriber:', err);
+      });
 
       return res.json({
         success: true,
@@ -566,6 +770,11 @@ app.post('/api/subscribe/verify-otp', async (req, res) => {
     // Retrieve Google Drive Link
     const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
     const driveLink = driveSetting ? driveSetting.value : '';
+
+    // Automatically send Thank You Email with direct download link!
+    sendThankYouEmail(cleanEmail, driveLink).catch(err => {
+      console.error('Auto Thank You Email error on verify-otp:', err);
+    });
 
     return res.json({
       success: true,
@@ -946,10 +1155,16 @@ app.get('/api/settings', requireAdmin, async (req, res) => {
   try {
     const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
     const smtpSetting = await Setting.findOne({ key: 'smtpSettings' });
+    const thankYouSetting = await Setting.findOne({ key: 'thankYouEmailSettings' });
 
     res.json({
       googleDriveLink: driveSetting ? driveSetting.value : '',
       smtpSettings: smtpSetting ? smtpSetting.value : {},
+      thankYouEmailSettings: thankYouSetting?.value || {
+        enabled: true,
+        subject: '🎁 Your Free Chibi Flex 3D Models Are Ready To Download!',
+        customNote: '',
+      },
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch settings' });
@@ -958,7 +1173,7 @@ app.get('/api/settings', requireAdmin, async (req, res) => {
 
 app.put('/api/settings', requireAdmin, async (req, res) => {
   try {
-    const { googleDriveLink, smtpSettings, newPassword } = req.body;
+    const { googleDriveLink, smtpSettings, thankYouEmailSettings, newPassword } = req.body;
 
     if (googleDriveLink !== undefined) {
       await Setting.findOneAndUpdate(
@@ -976,6 +1191,14 @@ app.put('/api/settings', requireAdmin, async (req, res) => {
       );
     }
 
+    if (thankYouEmailSettings !== undefined) {
+      await Setting.findOneAndUpdate(
+        { key: 'thankYouEmailSettings' },
+        { value: thankYouEmailSettings },
+        { upsert: true }
+      );
+    }
+
     if (newPassword && newPassword.trim().length >= 4) {
       await Setting.findOneAndUpdate(
         { key: 'adminPassword' },
@@ -987,6 +1210,53 @@ app.put('/api/settings', requireAdmin, async (req, res) => {
     res.json({ success: true, message: 'Settings updated successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update settings' });
+  }
+});
+
+// Admin: Send Test Thank You Email
+app.post('/api/admin/test-thank-you-email', requireAdmin, async (req, res) => {
+  try {
+    const { testEmail, subject, customNote } = req.body;
+    if (!testEmail || !testEmail.includes('@')) {
+      return res.status(400).json({ error: 'Valid test email address is required.' });
+    }
+
+    const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
+    const driveLink = driveSetting ? driveSetting.value : 'https://drive.google.com';
+
+    const { transporter, from } = await getMailTransporter();
+    const finalSubject = subject && subject.trim()
+      ? (subject.startsWith('[TEST]') ? subject.trim() : `[TEST] ${subject.trim()}`)
+      : '[TEST] 🎁 Your Free Chibi Flex 3D Models Are Ready To Download!';
+
+    const html = getThankYouHtmlEmail(driveLink, customNote);
+
+    await transporter.sendMail({
+      from,
+      to: testEmail.trim(),
+      subject: finalSubject,
+      html,
+    });
+
+    res.json({ success: true, message: `Test Thank You email sent successfully to ${testEmail}!` });
+  } catch (err) {
+    console.error('Test thank you email error:', err);
+    res.status(500).json({ error: err.message || 'Failed to send test thank you email.' });
+  }
+});
+
+// Admin: Preview Thank You Email HTML
+app.get('/api/admin/preview-thank-you-email', requireAdmin, async (req, res) => {
+  try {
+    const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
+    const driveLink = driveSetting ? driveSetting.value : 'https://drive.google.com';
+    const thankYouSetting = await Setting.findOne({ key: 'thankYouEmailSettings' });
+    const settings = thankYouSetting?.value || {};
+    const html = getThankYouHtmlEmail(driveLink, settings.customNote);
+    res.setHeader('Content-Type', 'text/html');
+    res.send(html);
+  } catch (err) {
+    res.status(500).send('Error generating email preview');
   }
 });
 

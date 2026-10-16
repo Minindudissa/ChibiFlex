@@ -2471,11 +2471,15 @@
       let inPageCooldownTimer = null;
       let popupCooldownTimer = null;
 
-      function unlockFreeModelsSystem(driveUrl, sourceName) {
+      function unlockFreeModelsSystem(driveUrl, sourceName, userEmail) {
         if (!driveUrl) return;
 
+        const email = userEmail || currentInPageEmail || currentPopupEmail || '';
         localStorage.setItem('chibiflex_free_unlocked', 'true');
         localStorage.setItem('chibiflex_drive_link', driveUrl);
+        if (email) {
+          localStorage.setItem('chibiflex_subscriber_email', email);
+        }
 
         // Track Lead event in Meta Pixel
         if (typeof fbq === 'function') {
@@ -2503,7 +2507,8 @@
         }
 
         // 3. Directly redirect to Thank You page for Facebook Ads conversion tracking
-        window.location.href = `thank-you.html?drive=${encodeURIComponent(driveUrl)}`;
+        const emailParam = email ? `&email=${encodeURIComponent(email)}` : '';
+        window.location.href = `thank-you.html?drive=${encodeURIComponent(driveUrl)}${emailParam}`;
       }
 
       function startButtonCooldown(btnEl, textEl, timerRef, seconds = 30) {

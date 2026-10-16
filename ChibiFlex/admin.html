@@ -1476,6 +1476,63 @@
             </form>
           </div>
 
+          <!-- Automated Thank You Email (Free Models Download) -->
+          <div class="card-box" style="margin-bottom: 2rem;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+              <div>
+                <h3 class="card-title">💌 Automated "Thank You" Email (Free Models Download)</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                  Sent automatically when a visitor requests or verifies their email to download Free Models. Directly delivers the Google Drive link and 3D printing guide to their inbox.
+                </p>
+              </div>
+              <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); padding: 6px 14px; border-radius: var(--radius-full);">
+                <input type="checkbox" id="thankyou-enabled" checked style="width: 17px; height: 17px; accent-color: var(--accent-cyan); cursor: pointer;" />
+                <span id="thankyou-status-label" style="font-weight: 700; font-size: 0.88rem; color: var(--accent-cyan);">Auto Email Active</span>
+              </label>
+            </div>
+
+            <form id="thankyou-settings-form">
+              <div class="form-group">
+                <label class="form-label" for="thankyou-subject">Email Subject</label>
+                <input
+                  type="text"
+                  id="thankyou-subject"
+                  class="form-input"
+                  placeholder="🎁 Your Free Chibi Flex 3D Models Are Ready To Download!"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="thankyou-note">
+                  Custom Welcome Note <span style="color: var(--text-muted); font-weight: 400;">(Optional — highlighted inside the email)</span>
+                </label>
+                <textarea
+                  id="thankyou-note"
+                  class="form-input"
+                  rows="2"
+                  placeholder="e.g. Thanks for supporting Chibi Flex! We hope you love printing these cute models. Let us know what you want to see next!"
+                ></textarea>
+              </div>
+
+              <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <button type="submit" class="btn btn-secondary">
+                  <i class="fa-solid fa-floppy-disk"></i>
+                  <span>Save Thank You Settings</span>
+                </button>
+
+                <button type="button" id="thankyou-test-btn" class="btn btn-secondary" style="background: rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.4); color: var(--accent-cyan);">
+                  <i class="fa-solid fa-paper-plane"></i>
+                  <span>Send Test Email</span>
+                </button>
+
+                <button type="button" id="thankyou-preview-btn" class="btn btn-secondary" style="background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.15);">
+                  <i class="fa-solid fa-eye"></i>
+                  <span>Preview Email</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
           <!-- Audience Selection & Subscribers Picker -->
           <div class="card-box" style="margin-bottom: 2rem;">
             <div class="card-header">
@@ -3276,11 +3333,33 @@
               document.getElementById('smtp-user').value = data.smtpSettings.user || '';
               document.getElementById('smtp-pass').value = data.smtpSettings.pass || '';
             }
+            if (data.thankYouEmailSettings) {
+              const ty = data.thankYouEmailSettings;
+              const isEn = ty.enabled !== false;
+              document.getElementById('thankyou-enabled').checked = isEn;
+              const statusLbl = document.getElementById('thankyou-status-label');
+              if (statusLbl) {
+                statusLbl.textContent = isEn ? 'Auto Email Active' : 'Auto Email Paused';
+                statusLbl.style.color = isEn ? 'var(--accent-cyan)' : 'var(--text-muted)';
+              }
+              document.getElementById('thankyou-subject').value = ty.subject || '';
+              document.getElementById('thankyou-note').value = ty.customNote || '';
+            }
           }
         } catch (err) {
           console.error(err);
         }
       }
+
+      // Toggle Thank You Active Label
+      document.getElementById('thankyou-enabled').addEventListener('change', (e) => {
+        const isEn = e.target.checked;
+        const statusLbl = document.getElementById('thankyou-status-label');
+        if (statusLbl) {
+          statusLbl.textContent = isEn ? 'Auto Email Active' : 'Auto Email Paused';
+          statusLbl.style.color = isEn ? 'var(--accent-cyan)' : 'var(--text-muted)';
+        }
+      });
 
       // Save Drive Link Form
       document.getElementById('drive-form').addEventListener('submit', async (e) => {
@@ -3330,6 +3409,74 @@
           }
         } catch (err) {
           showToast('SMTP update error', 'error');
+        }
+      });
+
+      // Save Thank You Email Form
+      document.getElementById('thankyou-settings-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const thankYouEmailSettings = {
+          enabled: document.getElementById('thankyou-enabled').checked,
+          subject: document.getElementById('thankyou-subject').value.trim() || '🎁 Your Free Chibi Flex 3D Models Are Ready To Download!',
+          customNote: document.getElementById('thankyou-note').value.trim(),
+        };
+
+        try {
+          const res = await fetch(`${API_BASE}/settings`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ thankYouEmailSettings }),
+          });
+
+          if (res.ok) {
+            showToast('Thank You email settings saved successfully!');
+          } else {
+            showToast('Failed to save Thank You settings', 'error');
+          }
+        } catch (err) {
+          showToast('Failed to save Thank You settings', 'error');
+        }
+      });
+
+      // Send Test Thank You Email
+      document.getElementById('thankyou-test-btn').addEventListener('click', async () => {
+        const testEmail = prompt('Enter your email address to receive the test Thank You email:');
+        if (!testEmail || !testEmail.includes('@')) return;
+
+        const subject = document.getElementById('thankyou-subject').value.trim();
+        const customNote = document.getElementById('thankyou-note').value.trim();
+
+        const btn = document.getElementById('thankyou-test-btn');
+        const origHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending test...';
+
+        try {
+          const res = await fetch(`${API_BASE}/admin/test-thank-you-email`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ testEmail, subject, customNote }),
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            showToast(data.message || 'Test Thank You email sent successfully!');
+          } else {
+            showToast(data.error || 'Failed to dispatch test email. Check SMTP settings.', 'error');
+          }
+        } catch (err) {
+          showToast('Network error while sending test email', 'error');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+        }
+      });
+
+      // Preview Thank You Email
+      document.getElementById('thankyou-preview-btn').addEventListener('click', () => {
+        const previewWin = window.open(`${API_BASE}/admin/preview-thank-you-email?token=${encodeURIComponent(token)}`, '_blank');
+        if (!previewWin) {
+          showToast('Pop-up blocked. Please allow pop-ups to preview the email.', 'error');
         }
       });
 
