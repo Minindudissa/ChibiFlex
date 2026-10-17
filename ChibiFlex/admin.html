@@ -187,9 +187,18 @@
         background: rgba(255, 255, 255, 0.08);
       }
 
-      .form-select option {
-        background: #12141c;
-        color: #ffffff;
+      select, .form-select {
+        cursor: pointer;
+      }
+
+      option,
+      select option,
+      .form-select option,
+      .form-input option,
+      .filter-input option {
+        background-color: #151722 !important;
+        color: #ffffff !important;
+        padding: 8px 12px;
       }
 
       .form-textarea {
@@ -2222,10 +2231,10 @@
           <!-- Template Selection -->
           <div class="form-group">
             <label class="form-label" for="patreon-template-select">Choose Pre-Designed Template *</label>
-            <select id="patreon-template-select" class="form-input" style="font-weight: 600; font-size: 0.95rem; border-color: rgba(244, 63, 94, 0.4);">
-              <option value="try-free-models">🎁 Template 1: Try Our Free Models (Google Drive Link)</option>
-              <option value="printed-free-models-join">🖨️ Template 2: Did you print free models? Join Paid Patreon Tiers!</option>
-              <option value="custom">✍️ Custom Blank Email</option>
+            <select id="patreon-template-select" class="form-select form-input" style="font-weight: 600; font-size: 0.95rem; border-color: rgba(244, 63, 94, 0.4); background-color: #151722; color: #ffffff;">
+              <option value="try-free-models" style="background-color: #151722; color: #ffffff;">🎁 Template 1: Try Our Free Models (Google Drive Link)</option>
+              <option value="printed-free-models-join" style="background-color: #151722; color: #ffffff;">🖨️ Template 2: Did you print free models? Join Paid Patreon Tiers!</option>
+              <option value="custom" style="background-color: #151722; color: #ffffff;">✍️ Custom Blank Email</option>
             </select>
             <span style="font-size: 0.8rem; color: var(--text-muted);">
               Select one of the 2 pre-made conversion templates or write a completely custom message below.
