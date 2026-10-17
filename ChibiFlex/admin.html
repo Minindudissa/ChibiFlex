@@ -1082,6 +1082,11 @@
             <i class="fa-solid fa-envelope-open-text"></i>
             <span>Subscribers</span>
           </button>
+          <button class="tab-btn" data-tab="tab-patreon">
+            <i class="fa-brands fa-patreon" style="color: #f43f5e;"></i>
+            <span>Patreon Members</span>
+            <span class="badge" id="patreon-nav-badge" style="margin-left: 6px; padding: 2px 7px; border-radius: 12px; font-size: 0.72rem; background: rgba(244, 63, 94, 0.2); color: #f43f5e; font-weight: 700;">0</span>
+          </button>
           <button class="tab-btn" data-tab="tab-marketing">
             <i class="fa-solid fa-paper-plane"></i>
             <span>Email Marketing</span>
@@ -1092,9 +1097,14 @@
         <div id="tab-overview" class="tab-content active">
           <div class="stats-grid">
             <div class="stat-card">
-              <div class="stat-title">Total Subscribers</div>
+              <div class="stat-title">Website Subscribers</div>
               <div class="stat-value" id="stat-subscribers">0</div>
               <div class="stat-sub">Email leads collected from site</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #f43f5e;">
+              <div class="stat-title">Patreon Members</div>
+              <div class="stat-value" id="stat-patreon" style="color: #f43f5e;">0</div>
+              <div class="stat-sub">Patreon free & past supporters</div>
             </div>
             <div class="stat-card cyan">
               <div class="stat-title">Total Model Images</div>
@@ -1116,11 +1126,14 @@
           <div class="card-box">
             <h3 class="card-title" style="margin-bottom: 1rem;">Quick Actions</h3>
             <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
-              Manage your 3D model portfolio, update the Google Drive download link for subscribers, and broadcast promotional campaigns.
+              Manage your 3D model portfolio, update download links, and broadcast promotional campaigns to both website subscribers and Patreon members.
             </p>
             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
               <button class="btn btn-secondary" onclick="switchTab('tab-models')">
                 <i class="fa-solid fa-plus"></i> Upload New Model Image
+              </button>
+              <button class="btn btn-secondary" onclick="switchTab('tab-patreon')">
+                <i class="fa-brands fa-patreon" style="color: #f43f5e;"></i> View Patreon Members
               </button>
               <button class="btn btn-secondary" onclick="switchTab('tab-drive')">
                 <i class="fa-brands fa-google-drive"></i> Update Drive Download Link
@@ -1877,6 +1890,129 @@
             </form>
           </div>
         </div>
+
+        <!-- TAB 6: PATREON MEMBERS -->
+        <div id="tab-patreon" class="tab-content">
+          <div class="card-box">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">
+                  <i class="fa-brands fa-patreon" style="color: #f43f5e; margin-right: 8px;"></i>
+                  Patreon Free Members & Community Leads
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                  Total Members: <strong id="patreon-total-count" style="color: #ffffff;">0</strong> &bull;
+                  Active: <strong id="patreon-active-count" style="color: var(--accent-emerald);">0</strong> &bull;
+                  Contacted: <strong id="patreon-emailed-count" style="color: var(--accent-pink);">0</strong>
+                </p>
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary" onclick="openAddPatreonModal()">
+                  <i class="fa-solid fa-user-plus"></i>
+                  <span>Add Member</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="openImportPatreonModal()">
+                  <i class="fa-solid fa-file-import"></i>
+                  <span>Import CSV</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="exportPatreonCSV()">
+                  <i class="fa-solid fa-file-csv"></i>
+                  <span>Export CSV</span>
+                </button>
+                <button type="button" class="btn btn-primary" onclick="openPatreonCampaignModal()" style="background: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%); border-color: #f43f5e; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.35);">
+                  <i class="fa-solid fa-paper-plane"></i>
+                  <span id="patreon-broadcast-btn-label">Broadcast Email</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-bar">
+              <div class="filter-group" style="flex: 1; min-width: 240px;">
+                <input
+                  type="text"
+                  id="search-patreon"
+                  class="filter-input"
+                  placeholder="🔍 Search by name, email, or user ID..."
+                  style="width: 100%;"
+                />
+              </div>
+              <div class="filter-group">
+                <span class="filter-label">Tier:</span>
+                <select id="patreon-filter-tier" class="filter-input" style="padding: 4px 10px;">
+                  <option value="all">All Tiers</option>
+                  <option value="Free">Free</option>
+                  <option value="Commercial">Commercial</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <span class="filter-label">Status:</span>
+                <select id="patreon-filter-status" class="filter-input" style="padding: 4px 10px;">
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <button type="button" class="btn btn-secondary" id="patreon-select-all-btn" style="padding: 5px 12px; font-size: 0.82rem;">
+                  <i class="fa-solid fa-check-double"></i> Select All
+                </button>
+                <button type="button" class="btn btn-secondary" id="patreon-clear-selection-btn" style="padding: 5px 12px; font-size: 0.82rem;">
+                  Clear (<span id="patreon-selected-count-badge">0</span>)
+                </button>
+                <button type="button" class="btn btn-secondary" id="patreon-clear-filter" style="padding: 5px 11px; font-size: 0.8rem;" title="Reset filters">
+                  <i class="fa-solid fa-rotate-left"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 40px; text-align: center;">
+                      <input type="checkbox" class="custom-checkbox" id="patreon-master-checkbox" title="Select / Deselect all on current page" />
+                    </th>
+                    <th style="width: 45px;">#</th>
+                    <th>Member Name</th>
+                    <th>Email Address</th>
+                    <th>Tier / Status</th>
+                    <th>Joined Date</th>
+                    <th>Email Outreach Status</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="patreon-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            <div class="pagination-bar">
+              <div class="page-info" id="patreon-page-info">Showing 0 of 0 members</div>
+              <div class="pagination-controls">
+                <div style="display: flex; align-items: center; gap: 6px; margin-right: 10px;">
+                  <span style="font-size: 0.8rem; color: var(--text-muted);">Rows:</span>
+                  <select id="patreon-per-page" class="filter-input" style="padding: 4px 8px; font-size: 0.8rem;">
+                    <option value="10">10</option>
+                    <option value="25" selected>25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+                <button type="button" class="page-btn" id="patreon-page-prev" title="Previous page">
+                  <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div id="patreon-page-numbers" style="display: flex; gap: 4px;"></div>
+                <button type="button" class="page-btn" id="patreon-page-next" title="Next page">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
 
@@ -2064,15 +2200,209 @@
       </div>
     </div>
 
+    <!-- Patreon Campaign / Email Dispatch Modal -->
+    <div id="patreon-campaign-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+      <div class="card-box" style="max-width: 840px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-glow); box-shadow: 0 25px 60px rgba(0,0,0,0.85); background: #12141c;">
+        <div class="card-header" style="margin-bottom: 1.25rem;">
+          <div>
+            <h3 class="card-title">
+              <i class="fa-brands fa-patreon" style="color: #f43f5e; margin-right: 8px;"></i>
+              Send Campaign to Patreon Members
+            </h3>
+            <span style="font-size: 0.85rem; color: var(--accent-pink); font-weight: 600;" id="patreon-campaign-audience-indicator">
+              Target Audience: All active members
+            </span>
+          </div>
+          <button type="button" class="btn btn-secondary" style="padding: 6px 12px;" onclick="closePatreonCampaignModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <form id="patreon-campaign-form">
+          <!-- Template Selection -->
+          <div class="form-group">
+            <label class="form-label" for="patreon-template-select">Choose Pre-Designed Template *</label>
+            <select id="patreon-template-select" class="form-input" style="font-weight: 600; font-size: 0.95rem; border-color: rgba(244, 63, 94, 0.4);">
+              <option value="try-free-models">🎁 Template 1: Try Our Free Models (Google Drive Link)</option>
+              <option value="printed-free-models-join">🖨️ Template 2: Did you print free models? Join Paid Patreon Tiers!</option>
+              <option value="custom">✍️ Custom Blank Email</option>
+            </select>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">
+              Select one of the 2 pre-made conversion templates or write a completely custom message below.
+            </span>
+          </div>
+
+          <!-- Subject -->
+          <div class="form-group">
+            <label class="form-label" for="patreon-campaign-subject">Email Subject *</label>
+            <input type="text" id="patreon-campaign-subject" class="form-input" required />
+          </div>
+
+          <!-- Heading -->
+          <div class="form-group">
+            <label class="form-label" for="patreon-campaign-heading">Email Headline / Greeting</label>
+            <input type="text" id="patreon-campaign-heading" class="form-input" />
+          </div>
+
+          <!-- Message Body with {NAME} personalizer -->
+          <div class="form-group">
+            <label class="form-label" for="patreon-campaign-message">
+              Message Body (Paragraphs)
+              <span style="font-size: 0.78rem; color: var(--accent-pink); font-weight: normal; margin-left: 6px;">💡 Use <code>{NAME}</code> to automatically insert each member's real name!</span>
+            </label>
+            <textarea id="patreon-campaign-message" class="form-textarea" rows="5"></textarea>
+          </div>
+
+          <!-- Custom Note / Callout -->
+          <div class="form-group">
+            <label class="form-label" for="patreon-campaign-note">Optional Custom Callout Note (Colored Box)</label>
+            <input type="text" id="patreon-campaign-note" class="form-input" placeholder="e.g. P.S. We just released the brand-new Dragon Flex model!" />
+          </div>
+
+          <!-- CTA Text -->
+          <div class="form-group">
+            <label class="form-label" for="patreon-campaign-cta">Main Action Button Text</label>
+            <input type="text" id="patreon-campaign-cta" class="form-input" />
+          </div>
+
+          <!-- Live HTML Preview -->
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="form-label" style="margin-bottom: 0;">Live Email Preview</label>
+              <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;" id="patreon-refresh-preview-btn">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh Preview
+              </button>
+            </div>
+            <iframe id="patreon-preview-frame" style="width: 100%; height: 320px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: #0b0c10;"></iframe>
+          </div>
+
+          <!-- Test Email Section -->
+          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 1.5rem;">
+            <label class="form-label" for="patreon-test-email">Send a Test Email First</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="email" id="patreon-test-email" class="form-input" placeholder="your-email@example.com" />
+              <button type="button" class="btn btn-secondary" id="patreon-send-test-btn" style="white-space: nowrap;">
+                <i class="fa-solid fa-paper-plane"></i> Send Test
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center;">
+            <button type="button" class="btn btn-secondary" onclick="closePatreonCampaignModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="patreon-campaign-submit-btn" style="background: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%); border-color: #f43f5e; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4); width: auto;">
+              <i class="fa-solid fa-paper-plane"></i>
+              <span id="patreon-campaign-submit-text">Send Campaign Now</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add / Edit Patreon Member Modal -->
+    <div id="patreon-member-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+      <div class="card-box" style="max-width: 500px; width: 100%; border: 1px solid var(--border-glow); box-shadow: 0 25px 60px rgba(0,0,0,0.85); background: #12141c;">
+        <div class="card-header" style="margin-bottom: 1.25rem;">
+          <h3 class="card-title" id="patreon-member-modal-title">
+            <i class="fa-brands fa-patreon" style="color: #f43f5e;"></i> Add Patreon Member
+          </h3>
+          <button type="button" class="btn btn-secondary" style="padding: 6px 12px;" onclick="closePatreonMemberModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form id="patreon-member-form">
+          <input type="hidden" id="patreon-member-id" value="" />
+          <div class="form-group">
+            <label class="form-label" for="patreon-member-name">Member Name *</label>
+            <input type="text" id="patreon-member-name" class="form-input" placeholder="e.g. John Doe" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="patreon-member-email">Email Address *</label>
+            <input type="email" id="patreon-member-email" class="form-input" placeholder="e.g. john@example.com" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="patreon-member-tier">Patreon Tier</label>
+            <input type="text" id="patreon-member-tier" class="form-input" placeholder="e.g. Free, Commercial, Maker" value="Free" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="patreon-member-patron-status">Patron Status</label>
+            <input type="text" id="patreon-member-patron-status" class="form-input" placeholder="e.g. Free Member, Former patron" value="Free Member" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="patreon-member-status">Status</label>
+            <select id="patreon-member-status" class="form-input">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="unsubscribed">Unsubscribed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="patreon-member-notes">Admin Notes</label>
+            <textarea id="patreon-member-notes" class="form-textarea" rows="2" placeholder="Optional notes about this member..."></textarea>
+          </div>
+          <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-secondary" onclick="closePatreonMemberModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="patreon-member-save-btn" style="width: auto;">
+              <i class="fa-solid fa-floppy-disk"></i> Save Member
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Import Patreon CSV Modal -->
+    <div id="patreon-import-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+      <div class="card-box" style="max-width: 600px; width: 100%; border: 1px solid var(--border-glow); box-shadow: 0 25px 60px rgba(0,0,0,0.85); background: #12141c;">
+        <div class="card-header" style="margin-bottom: 1.25rem;">
+          <h3 class="card-title">
+            <i class="fa-solid fa-file-import" style="color: var(--accent-cyan);"></i> Import Patreon Members CSV
+          </h3>
+          <button type="button" class="btn btn-secondary" style="padding: 6px 12px;" onclick="closeImportPatreonModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
+          Paste rows from your Patreon Member export CSV or select a <code>.csv</code> file.
+        </p>
+        <form id="patreon-import-form">
+          <div class="form-group">
+            <label class="form-label">Upload .CSV File</label>
+            <input type="file" id="patreon-import-file-input" accept=".csv,text/csv" class="form-input" style="padding: 6px 10px;" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="patreon-import-textarea">Or Paste CSV Content Directly</label>
+            <textarea
+              id="patreon-import-textarea"
+              class="form-textarea"
+              rows="6"
+              placeholder="Name,Email,Discord,Patron Status,Tier...&#10;Alice,alice@example.com,,,Free&#10;Bob,bob@example.com,,,Free"
+              required
+            ></textarea>
+          </div>
+          <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeImportPatreonModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="patreon-import-submit-btn" style="width: auto;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Import Members
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- JAVASCRIPT LOGIC -->
     <script>
       const API_BASE = '/api';
       let token = localStorage.getItem('adminToken') || '';
       let allModels = [];
       let allSubscribers = [];
+      let allPatreonMembers = [];
       let allCategories = [];
       let currentCategory = 'all';
       let currentActiveRelease = null;
+      let patreonTemplates = {};
+      let patreonDriveLink = '';
+      let patreonPatreonLink = 'https://www.patreon.com/ChibiFlex';
+      let patreonDirectRecipient = null;
 
       // Elements
       const loginScreen = document.getElementById('login-screen');
@@ -2180,6 +2510,8 @@
           fetchModels(),
           fetchMonthlyReleaseInfo(),
           fetchSubscribers(),
+          fetchPatreonMembers(),
+          fetchPatreonTemplates(),
           fetchSettings(),
         ]);
       }
@@ -4122,6 +4454,770 @@
           updateAudienceDisplay();
         }
       });
+
+      // ==========================================
+      // TAB 6: PATREON MEMBERS (CRUD & CAMPAIGNS)
+      // ==========================================
+      let patreonCurrentPage = 1;
+      let patreonPerPage = 25;
+      let patreonSearchQuery = '';
+      let patreonFilterTier = 'all';
+      let patreonFilterStatus = 'all';
+      let patreonSelectedEmails = new Set();
+      let patreonDirectRecipient = null;
+
+      // Fetch Patreon Members
+      async function fetchPatreonMembers() {
+        try {
+          const res = await fetch(`${API_BASE}/admin/patreon-members?limit=2000`, {
+            headers: getAuthHeaders(),
+          });
+
+          if (res.status === 401) {
+            showLogin();
+            showToast('Session expired. Please log in again.', 'warning');
+            return;
+          }
+
+          if (!res.ok) {
+            console.error('Failed to fetch Patreon members:', res.status);
+            return;
+          }
+
+          const data = await res.json();
+          allPatreonMembers = data.members || [];
+
+          // Update Stats
+          const totalCountEl = document.getElementById('patreon-total-count');
+          if (totalCountEl) totalCountEl.textContent = allPatreonMembers.length;
+
+          const activeCount = allPatreonMembers.filter((m) => m.status === 'active').length;
+          const activeCountEl = document.getElementById('patreon-active-count');
+          if (activeCountEl) activeCountEl.textContent = activeCount;
+
+          const emailedCount = allPatreonMembers.filter((m) => m.emailsSent && m.emailsSent.length > 0).length;
+          const emailedCountEl = document.getElementById('patreon-emailed-count');
+          if (emailedCountEl) emailedCountEl.textContent = emailedCount;
+
+          const statPatreon = document.getElementById('stat-patreon');
+          if (statPatreon) statPatreon.textContent = allPatreonMembers.length;
+
+          const navBadge = document.getElementById('patreon-nav-badge');
+          if (navBadge) navBadge.textContent = allPatreonMembers.length;
+
+          renderPatreonTab();
+        } catch (err) {
+          console.error('fetchPatreonMembers error:', err);
+        }
+      }
+
+      // Fetch Patreon Email Templates
+      async function fetchPatreonTemplates() {
+        try {
+          const res = await fetch(`${API_BASE}/admin/patreon-members/templates`, {
+            headers: getAuthHeaders(),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            patreonTemplates = data.templates || {};
+            patreonDriveLink = data.driveLink || '';
+            patreonPatreonLink = data.patreonLink || 'https://www.patreon.com/ChibiFlex';
+          }
+        } catch (err) {
+          console.error('fetchPatreonTemplates error:', err);
+        }
+      }
+
+      // Filter Patreon Members
+      function getFilteredPatreonMembers() {
+        return allPatreonMembers.filter((m) => {
+          if (patreonSearchQuery) {
+            const nameMatch = (m.name || '').toLowerCase().includes(patreonSearchQuery);
+            const emailMatch = (m.email || '').toLowerCase().includes(patreonSearchQuery);
+            const userMatch = (m.userId || '').toLowerCase().includes(patreonSearchQuery);
+            if (!nameMatch && !emailMatch && !userMatch) return false;
+          }
+
+          if (patreonFilterTier !== 'all') {
+            if ((m.tier || '').toLowerCase() !== patreonFilterTier.toLowerCase()) {
+              return false;
+            }
+          }
+
+          if (patreonFilterStatus !== 'all') {
+            if ((m.status || 'active').toLowerCase() !== patreonFilterStatus.toLowerCase()) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+      }
+
+      // Render Patreon Tab
+      function renderPatreonTab() {
+        const filtered = getFilteredPatreonMembers();
+        const { slice, total, totalPages, currentPage, startIndex, endIndex } = getPaginatedSlice(
+          filtered,
+          patreonCurrentPage,
+          patreonPerPage
+        );
+        patreonCurrentPage = currentPage;
+
+        const tbody = document.getElementById('patreon-table-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        if (total === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+                <i class="fa-brands fa-patreon" style="font-size: 2.5rem; opacity: 0.25; margin-bottom: 0.8rem; display: block; color: #f43f5e;"></i>
+                No Patreon members found matching your search.
+              </td>
+            </tr>
+          `;
+        } else {
+          slice.forEach((m, idx) => {
+            const emailKey = (m.email || '').toLowerCase().trim();
+            const isChecked = patreonSelectedEmails.has(emailKey);
+            const dateStr = formatDateTime(m.patronageSinceDate || m.createdAt);
+
+            // Outreach badge
+            let outreachBadge = `<span class="model-badge" style="background: rgba(148, 163, 184, 0.12); color: var(--text-muted);"><i class="fa-regular fa-envelope"></i> Not emailed</span>`;
+            if (m.emailsSent && m.emailsSent.length > 0) {
+              const last = m.emailsSent[m.emailsSent.length - 1];
+              const tplName = last.templateKey === 'try-free-models' ? 'Free Models Link' : (last.templateKey === 'printed-free-models-join' ? 'Patreon Upgrade' : 'Custom');
+              outreachBadge = `<span class="model-badge" style="background: rgba(244, 63, 94, 0.15); color: #f43f5e;" title="Sent: ${escapeAttr(last.subject || '')} on ${formatDateTime(last.sentAt)}"><i class="fa-solid fa-check"></i> ${tplName} (${m.emailsSent.length})</span>`;
+            }
+
+            const tr = document.createElement('tr');
+            if (isChecked) tr.classList.add('row-selected');
+
+            tr.innerHTML = `
+              <td style="text-align: center;">
+                <input type="checkbox" class="custom-checkbox patreon-row-checkbox" data-email="${escapeAttr(emailKey)}" ${isChecked ? 'checked' : ''} />
+              </td>
+              <td>${startIndex + idx + 1}</td>
+              <td><strong>${escapeHtml(m.name || 'Patreon Member')}</strong></td>
+              <td>${escapeHtml(m.email)}</td>
+              <td>
+                <span class="model-badge" style="background: rgba(0, 210, 255, 0.12); color: var(--accent-cyan);">${escapeHtml(m.tier || 'Free')}</span>
+                <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 4px;">${escapeHtml(m.patronStatus || '')}</span>
+              </td>
+              <td>
+                <i class="fa-regular fa-calendar" style="color: var(--accent-pink); margin-right: 5px; font-size: 0.8rem;"></i>
+                ${dateStr}
+              </td>
+              <td>${outreachBadge}</td>
+              <td style="text-align: right;">
+                <div style="display: inline-flex; gap: 6px;">
+                  <button type="button" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.8rem;" title="Send email to this member" onclick="openDirectPatreonEmail('${escapeAttr(m.email)}', '${escapeAttr(m.name || '')}')">
+                    <i class="fa-solid fa-paper-plane" style="color: #f43f5e;"></i>
+                  </button>
+                  <button type="button" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.8rem;" title="Edit member" onclick="openEditPatreonModal('${m._id}')">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                  <button type="button" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" title="Delete member" onclick="deletePatreonMember('${m._id}')">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            `;
+
+            const cb = tr.querySelector('.patreon-row-checkbox');
+            cb.addEventListener('change', (e) => {
+              if (e.target.checked) {
+                patreonSelectedEmails.add(emailKey);
+                tr.classList.add('row-selected');
+              } else {
+                patreonSelectedEmails.delete(emailKey);
+                tr.classList.remove('row-selected');
+              }
+              updatePatreonSelectionBadge();
+              updatePatreonMasterCheckbox(slice);
+            });
+
+            tbody.appendChild(tr);
+          });
+        }
+
+        // Update master checkbox
+        updatePatreonMasterCheckbox(slice);
+
+        // Update Pagination Info
+        const infoEl = document.getElementById('patreon-page-info');
+        if (infoEl) {
+          infoEl.textContent = total === 0 ? 'Showing 0 of 0 members' : `Showing ${startIndex + 1} to ${endIndex} of ${total} members`;
+        }
+
+        const prevBtn = document.getElementById('patreon-page-prev');
+        const nextBtn = document.getElementById('patreon-page-next');
+        if (prevBtn) prevBtn.disabled = currentPage <= 1;
+        if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+
+        const numbersContainer = document.getElementById('patreon-page-numbers');
+        if (numbersContainer) {
+          numbersContainer.innerHTML = '';
+          const startP = Math.max(1, currentPage - 2);
+          const endP = Math.min(totalPages, startP + 4);
+          for (let p = startP; p <= endP; p++) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `page-btn ${p === currentPage ? 'active' : ''}`;
+            btn.textContent = p;
+            btn.onclick = () => {
+              patreonCurrentPage = p;
+              renderPatreonTab();
+            };
+            numbersContainer.appendChild(btn);
+          }
+        }
+      }
+
+      function updatePatreonSelectionBadge() {
+        const badge = document.getElementById('patreon-selected-count-badge');
+        if (badge) badge.textContent = patreonSelectedEmails.size;
+        const btnLabel = document.getElementById('patreon-broadcast-btn-label');
+        if (btnLabel) {
+          btnLabel.textContent = patreonSelectedEmails.size > 0 ? `Email Selected (${patreonSelectedEmails.size})` : 'Broadcast Email';
+        }
+      }
+
+      function updatePatreonMasterCheckbox(slice) {
+        const master = document.getElementById('patreon-master-checkbox');
+        if (!master) return;
+        if (slice.length === 0) {
+          master.checked = false;
+          master.indeterminate = false;
+          return;
+        }
+        const totalCheckedInSlice = slice.filter((m) => patreonSelectedEmails.has((m.email || '').toLowerCase().trim())).length;
+        master.checked = totalCheckedInSlice === slice.length;
+        master.indeterminate = totalCheckedInSlice > 0 && totalCheckedInSlice < slice.length;
+      }
+
+      // Master checkbox change
+      const patreonMasterCheckbox = document.getElementById('patreon-master-checkbox');
+      if (patreonMasterCheckbox) {
+        patreonMasterCheckbox.addEventListener('change', (e) => {
+          const filtered = getFilteredPatreonMembers();
+          const { slice } = getPaginatedSlice(filtered, patreonCurrentPage, patreonPerPage);
+          slice.forEach((m) => {
+            const emailKey = (m.email || '').toLowerCase().trim();
+            if (e.target.checked) {
+              patreonSelectedEmails.add(emailKey);
+            } else {
+              patreonSelectedEmails.delete(emailKey);
+            }
+          });
+          renderPatreonTab();
+          updatePatreonSelectionBadge();
+        });
+      }
+
+      // Select All across all search results
+      const patreonSelectAllBtn = document.getElementById('patreon-select-all-btn');
+      if (patreonSelectAllBtn) {
+        patreonSelectAllBtn.addEventListener('click', () => {
+          const filtered = getFilteredPatreonMembers();
+          filtered.forEach((m) => {
+            const emailKey = (m.email || '').toLowerCase().trim();
+            if (emailKey) patreonSelectedEmails.add(emailKey);
+          });
+          renderPatreonTab();
+          updatePatreonSelectionBadge();
+          showToast(`Selected all ${patreonSelectedEmails.size} member(s)!`);
+        });
+      }
+
+      // Clear selection
+      const patreonClearSelectionBtn = document.getElementById('patreon-clear-selection-btn');
+      if (patreonClearSelectionBtn) {
+        patreonClearSelectionBtn.addEventListener('click', () => {
+          patreonSelectedEmails.clear();
+          renderPatreonTab();
+          updatePatreonSelectionBadge();
+        });
+      }
+
+      // Search & Filters Listeners
+      const patreonSearchInput = document.getElementById('search-patreon');
+      if (patreonSearchInput) {
+        patreonSearchInput.addEventListener('input', (e) => {
+          patreonSearchQuery = e.target.value.toLowerCase().trim();
+          patreonCurrentPage = 1;
+          renderPatreonTab();
+        });
+      }
+
+      const patreonFilterTierSelect = document.getElementById('patreon-filter-tier');
+      if (patreonFilterTierSelect) {
+        patreonFilterTierSelect.addEventListener('change', (e) => {
+          patreonFilterTier = e.target.value;
+          patreonCurrentPage = 1;
+          renderPatreonTab();
+        });
+      }
+
+      const patreonFilterStatusSelect = document.getElementById('patreon-filter-status');
+      if (patreonFilterStatusSelect) {
+        patreonFilterStatusSelect.addEventListener('change', (e) => {
+          patreonFilterStatus = e.target.value;
+          patreonCurrentPage = 1;
+          renderPatreonTab();
+        });
+      }
+
+      const patreonClearFilterBtn = document.getElementById('patreon-clear-filter');
+      if (patreonClearFilterBtn) {
+        patreonClearFilterBtn.addEventListener('click', () => {
+          if (patreonSearchInput) patreonSearchInput.value = '';
+          if (patreonFilterTierSelect) patreonFilterTierSelect.value = 'all';
+          if (patreonFilterStatusSelect) patreonFilterStatusSelect.value = 'all';
+          patreonSearchQuery = '';
+          patreonFilterTier = 'all';
+          patreonFilterStatus = 'all';
+          patreonCurrentPage = 1;
+          renderPatreonTab();
+        });
+      }
+
+      const patreonPerPageSelect = document.getElementById('patreon-per-page');
+      if (patreonPerPageSelect) {
+        patreonPerPageSelect.addEventListener('change', (e) => {
+          patreonPerPage = Number(e.target.value) || 25;
+          patreonCurrentPage = 1;
+          renderPatreonTab();
+        });
+      }
+
+      const patreonPrevBtn = document.getElementById('patreon-page-prev');
+      if (patreonPrevBtn) {
+        patreonPrevBtn.addEventListener('click', () => {
+          if (patreonCurrentPage > 1) {
+            patreonCurrentPage--;
+            renderPatreonTab();
+          }
+        });
+      }
+
+      const patreonNextBtn = document.getElementById('patreon-page-next');
+      if (patreonNextBtn) {
+        patreonNextBtn.addEventListener('click', () => {
+          patreonCurrentPage++;
+          renderPatreonTab();
+        });
+      }
+
+      // Export Patreon Members CSV
+      window.exportPatreonCSV = function () {
+        window.open(`${API_BASE}/admin/patreon-members/export?token=${token}`, '_blank');
+      };
+
+      // Add / Edit Member Modal
+      window.openAddPatreonModal = function () {
+        document.getElementById('patreon-member-modal-title').innerHTML = '<i class="fa-brands fa-patreon" style="color: #f43f5e;"></i> Add Patreon Member';
+        document.getElementById('patreon-member-id').value = '';
+        document.getElementById('patreon-member-name').value = '';
+        document.getElementById('patreon-member-email').value = '';
+        document.getElementById('patreon-member-tier').value = 'Free';
+        document.getElementById('patreon-member-patron-status').value = 'Free Member';
+        document.getElementById('patreon-member-status').value = 'active';
+        document.getElementById('patreon-member-notes').value = '';
+        document.getElementById('patreon-member-modal').style.display = 'flex';
+        document.getElementById('patreon-member-name').focus();
+      };
+
+      window.openEditPatreonModal = function (id) {
+        const member = allPatreonMembers.find((m) => m._id === id);
+        if (!member) return;
+
+        document.getElementById('patreon-member-modal-title').innerHTML = '<i class="fa-solid fa-pen-to-square" style="color: var(--accent-pink);"></i> Edit Patreon Member';
+        document.getElementById('patreon-member-id').value = member._id;
+        document.getElementById('patreon-member-name').value = member.name || '';
+        document.getElementById('patreon-member-email').value = member.email || '';
+        document.getElementById('patreon-member-tier').value = member.tier || 'Free';
+        document.getElementById('patreon-member-patron-status').value = member.patronStatus || 'Free Member';
+        document.getElementById('patreon-member-status').value = member.status || 'active';
+        document.getElementById('patreon-member-notes').value = member.notes || '';
+        document.getElementById('patreon-member-modal').style.display = 'flex';
+      };
+
+      window.closePatreonMemberModal = function () {
+        const modal = document.getElementById('patreon-member-modal');
+        if (modal) modal.style.display = 'none';
+      };
+
+      // Member Form Submit
+      const patreonMemberForm = document.getElementById('patreon-member-form');
+      if (patreonMemberForm) {
+        patreonMemberForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const id = document.getElementById('patreon-member-id').value;
+          const payload = {
+            name: document.getElementById('patreon-member-name').value.trim(),
+            email: document.getElementById('patreon-member-email').value.trim(),
+            tier: document.getElementById('patreon-member-tier').value.trim(),
+            patronStatus: document.getElementById('patreon-member-patron-status').value.trim(),
+            status: document.getElementById('patreon-member-status').value,
+            notes: document.getElementById('patreon-member-notes').value.trim(),
+          };
+
+          const btn = document.getElementById('patreon-member-save-btn');
+          const origHtml = btn.innerHTML;
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+          try {
+            const url = id ? `${API_BASE}/admin/patreon-members/${id}` : `${API_BASE}/admin/patreon-members`;
+            const method = id ? 'PUT' : 'POST';
+
+            const res = await fetch(url, {
+              method,
+              headers: getAuthHeaders(),
+              body: JSON.stringify(payload),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+              showToast(data.message || 'Patreon member saved successfully!');
+              closePatreonMemberModal();
+              await fetchPatreonMembers();
+            } else {
+              showToast(data.error || 'Failed to save member', 'error');
+            }
+          } catch (err) {
+            showToast('Network error while saving member', 'error');
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+          }
+        });
+      }
+
+      // Delete Member
+      window.deletePatreonMember = async function (id) {
+        if (!confirm('Are you sure you want to remove this member from the list?')) return;
+        try {
+          const res = await fetch(`${API_BASE}/admin/patreon-members/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+          });
+          if (res.ok) {
+            showToast('Member removed successfully');
+            await fetchPatreonMembers();
+          } else {
+            showToast('Failed to remove member', 'error');
+          }
+        } catch (err) {
+          showToast('Failed to delete member', 'error');
+        }
+      };
+
+      // Import CSV Modal
+      window.openImportPatreonModal = function () {
+        document.getElementById('patreon-import-textarea').value = '';
+        document.getElementById('patreon-import-file-input').value = '';
+        document.getElementById('patreon-import-modal').style.display = 'flex';
+      };
+
+      window.closeImportPatreonModal = function () {
+        const modal = document.getElementById('patreon-import-modal');
+        if (modal) modal.style.display = 'none';
+      };
+
+      // File input reader for CSV import
+      const patreonImportFileInput = document.getElementById('patreon-import-file-input');
+      if (patreonImportFileInput) {
+        patreonImportFileInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            document.getElementById('patreon-import-textarea').value = event.target.result;
+          };
+          reader.readAsText(file);
+        });
+      }
+
+      // Submit CSV Import
+      const patreonImportForm = document.getElementById('patreon-import-form');
+      if (patreonImportForm) {
+        patreonImportForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const csvText = document.getElementById('patreon-import-textarea').value.trim();
+          if (!csvText) {
+            showToast('Please provide CSV content to import', 'error');
+            return;
+          }
+
+          const btn = document.getElementById('patreon-import-submit-btn');
+          const origHtml = btn.innerHTML;
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Importing...';
+
+          try {
+            const res = await fetch(`${API_BASE}/admin/patreon-members/import-csv`, {
+              method: 'POST',
+              headers: getAuthHeaders(),
+              body: JSON.stringify({ csvText }),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+              showToast(data.message || 'Import completed!');
+              closeImportPatreonModal();
+              await fetchPatreonMembers();
+            } else {
+              showToast(data.error || 'Failed to import CSV', 'error');
+            }
+          } catch (err) {
+            showToast('Import request error', 'error');
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+          }
+        });
+      }
+
+      // ==========================================
+      // PATREON CAMPAIGN / EMAIL DISPATCH LOGIC
+      // ==========================================
+      window.openDirectPatreonEmail = function (email, name) {
+        openPatreonCampaignModal([email], name);
+      };
+
+      window.openPatreonCampaignModal = function (presetEmails = null, presetName = null) {
+        const modal = document.getElementById('patreon-campaign-modal');
+        if (!modal) return;
+
+        const indicator = document.getElementById('patreon-campaign-audience-indicator');
+        const submitText = document.getElementById('patreon-campaign-submit-text');
+
+        if (presetEmails && presetEmails.length > 0) {
+          patreonDirectRecipient = presetEmails[0];
+          indicator.textContent = `🎯 Direct Email to: ${presetEmails[0]} (${presetName || 'Member'})`;
+          submitText.textContent = `Send to ${presetEmails[0]}`;
+        } else if (patreonSelectedEmails.size > 0) {
+          patreonDirectRecipient = null;
+          indicator.textContent = `🎯 Target Audience: ${patreonSelectedEmails.size} Selected Patreon Member(s)`;
+          submitText.textContent = `Send to ${patreonSelectedEmails.size} Selected Member(s)`;
+        } else {
+          patreonDirectRecipient = null;
+          const activeTotal = allPatreonMembers.filter((m) => m.status === 'active').length;
+          indicator.textContent = `📢 Target Audience: ALL Active Patreon Members (${activeTotal} Recipients)`;
+          submitText.textContent = `Send to All Active Members (${activeTotal})`;
+        }
+
+        // Default to Template 1
+        const tplSelect = document.getElementById('patreon-template-select');
+        tplSelect.value = 'try-free-models';
+        applyPatreonTemplateFields('try-free-models');
+
+        modal.style.display = 'flex';
+        updatePatreonPreview();
+      };
+
+      window.closePatreonCampaignModal = function () {
+        const modal = document.getElementById('patreon-campaign-modal');
+        if (modal) modal.style.display = 'none';
+        patreonDirectRecipient = null;
+      };
+
+      function applyPatreonTemplateFields(key) {
+        const tpl = patreonTemplates[key] || {
+          subject: '',
+          defaultHeading: '',
+          defaultMessage: '',
+          ctaText: '',
+        };
+
+        document.getElementById('patreon-campaign-subject').value = tpl.subject || '';
+        document.getElementById('patreon-campaign-heading').value = tpl.defaultHeading || '';
+        document.getElementById('patreon-campaign-message').value = tpl.defaultMessage || '';
+        document.getElementById('patreon-campaign-note').value = '';
+        document.getElementById('patreon-campaign-cta').value = tpl.ctaText || 'Download Free 3D Models &rarr;';
+      }
+
+      // Template dropdown change
+      const patreonTplSelect = document.getElementById('patreon-template-select');
+      if (patreonTplSelect) {
+        patreonTplSelect.addEventListener('change', (e) => {
+          applyPatreonTemplateFields(e.target.value);
+          updatePatreonPreview();
+        });
+      }
+
+      // Update Preview
+      async function updatePatreonPreview() {
+        const frame = document.getElementById('patreon-preview-frame');
+        if (!frame) return;
+
+        const templateKey = document.getElementById('patreon-template-select').value;
+        const heading = document.getElementById('patreon-campaign-heading').value;
+        const message = document.getElementById('patreon-campaign-message').value;
+        const customNote = document.getElementById('patreon-campaign-note').value;
+        const ctaText = document.getElementById('patreon-campaign-cta').value;
+
+        try {
+          const res = await fetch(`${API_BASE}/admin/patreon-members/preview-email`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+              templateKey,
+              heading,
+              message,
+              customNote,
+              ctaText,
+              sampleName: 'Alex',
+            }),
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            frame.srcdoc = data.html || '';
+          }
+        } catch (err) {
+          console.error('Failed to refresh preview:', err);
+        }
+      }
+
+      // Refresh Preview button
+      const patreonRefreshPreviewBtn = document.getElementById('patreon-refresh-preview-btn');
+      if (patreonRefreshPreviewBtn) {
+        patreonRefreshPreviewBtn.addEventListener('click', updatePatreonPreview);
+      }
+
+      // Send Test Email
+      const patreonSendTestBtn = document.getElementById('patreon-send-test-btn');
+      if (patreonSendTestBtn) {
+        patreonSendTestBtn.addEventListener('click', async () => {
+          const testEmail = (document.getElementById('patreon-test-email').value || '').trim();
+          if (!testEmail || !testEmail.includes('@')) {
+            showToast('Please enter a valid test email address first', 'error');
+            document.getElementById('patreon-test-email').focus();
+            return;
+          }
+
+          const templateKey = document.getElementById('patreon-template-select').value;
+          const subject = document.getElementById('patreon-campaign-subject').value.trim();
+          const heading = document.getElementById('patreon-campaign-heading').value.trim();
+          const message = document.getElementById('patreon-campaign-message').value.trim();
+          const customNote = document.getElementById('patreon-campaign-note').value.trim();
+          const ctaText = document.getElementById('patreon-campaign-cta').value.trim();
+
+          const origHtml = patreonSendTestBtn.innerHTML;
+          patreonSendTestBtn.disabled = true;
+          patreonSendTestBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending test...';
+
+          try {
+            const res = await fetch(`${API_BASE}/admin/patreon-members/send-email`, {
+              method: 'POST',
+              headers: getAuthHeaders(),
+              body: JSON.stringify({
+                templateKey,
+                subject,
+                heading,
+                message,
+                customNote,
+                ctaText,
+                isTest: true,
+                testEmail,
+              }),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+              showToast(data.message || 'Test email dispatched successfully!');
+            } else {
+              showToast(data.error || 'Failed to send test email. Check SMTP settings.', 'error');
+            }
+          } catch (err) {
+            showToast('Network error while dispatching test email', 'error');
+          } finally {
+            patreonSendTestBtn.disabled = false;
+            patreonSendTestBtn.innerHTML = origHtml;
+          }
+        });
+      }
+
+      // Campaign Form Submit
+      const patreonCampaignForm = document.getElementById('patreon-campaign-form');
+      if (patreonCampaignForm) {
+        patreonCampaignForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const templateKey = document.getElementById('patreon-template-select').value;
+          const subject = document.getElementById('patreon-campaign-subject').value.trim();
+          const heading = document.getElementById('patreon-campaign-heading').value.trim();
+          const message = document.getElementById('patreon-campaign-message').value.trim();
+          const customNote = document.getElementById('patreon-campaign-note').value.trim();
+          const ctaText = document.getElementById('patreon-campaign-cta').value.trim();
+
+          if (!subject) {
+            showToast('Subject line is required', 'error');
+            return;
+          }
+
+          let recipientEmails = null;
+          let confirmMsg = '';
+
+          if (patreonDirectRecipient) {
+            recipientEmails = [patreonDirectRecipient];
+            confirmMsg = `Send this email directly to ${patreonDirectRecipient}?`;
+          } else if (patreonSelectedEmails.size > 0) {
+            recipientEmails = Array.from(patreonSelectedEmails);
+            confirmMsg = `Send this campaign to ${recipientEmails.length} selected Patreon member(s)?`;
+          } else {
+            const activeCount = allPatreonMembers.filter((m) => m.status === 'active').length;
+            if (activeCount === 0) {
+              showToast('No active Patreon members to send to', 'error');
+              return;
+            }
+            confirmMsg = `Are you sure you want to broadcast this campaign to ALL ${activeCount} active Patreon members?`;
+          }
+
+          if (!confirm(confirmMsg)) return;
+
+          const submitBtn = document.getElementById('patreon-campaign-submit-btn');
+          const submitText = document.getElementById('patreon-campaign-submit-text');
+          const origText = submitText.textContent;
+          submitBtn.disabled = true;
+          submitText.textContent = 'Sending emails...';
+
+          try {
+            const res = await fetch(`${API_BASE}/admin/patreon-members/send-email`, {
+              method: 'POST',
+              headers: getAuthHeaders(),
+              body: JSON.stringify({
+                templateKey,
+                subject,
+                heading,
+                message,
+                customNote,
+                ctaText,
+                isTest: false,
+                recipientEmails,
+              }),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+              showToast(data.message || 'Campaign sent successfully!');
+              closePatreonCampaignModal();
+              await fetchPatreonMembers();
+            } else {
+              showToast(data.error || 'Failed to send campaign', 'error');
+            }
+          } catch (err) {
+            showToast('Campaign dispatch network error', 'error');
+          } finally {
+            submitBtn.disabled = false;
+            submitText.textContent = origText;
+          }
+        });
+      }
     </script>
   </body>
 </html>

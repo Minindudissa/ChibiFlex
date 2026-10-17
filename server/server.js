@@ -6,12 +6,20 @@ import multer from 'multer';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import dns from 'dns/promises';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { ModelItem } from './models/ModelItem.js';
 import { Subscriber } from './models/Subscriber.js';
 import { Setting } from './models/Setting.js';
 import { Category } from './models/Category.js';
 import { OtpVerification } from './models/OtpVerification.js';
+import { PatreonMember } from './models/PatreonMember.js';
+import { PATREON_TEMPLATES, renderPatreonEmail } from './patreonEmailTemplates.js';
 import { uploadToR2, deleteFromR2 } from './r2.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -161,6 +169,63 @@ async function initDefaults() {
     if (!exists) {
       await Category.create(cat);
     }
+  }
+
+  // Seed initial Patreon members from CSV if available
+  await seedPatreonMembersFromCSV();
+}
+
+async function seedPatreonMembersFromCSV() {
+  try {
+    const csvPath = path.join(__dirname, 'data', 'patreon_free_members.csv');
+    if (!fs.existsSync(csvPath)) return;
+
+    const content = fs.readFileSync(csvPath, 'utf-8');
+    const lines = content.split(/\r?\n/).filter((l) => l.trim().length > 0);
+    if (lines.length <= 1) return;
+
+    const bulkOps = [];
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      const parts = line.split(',');
+      const name = parts[0]?.trim() || 'Patreon Member';
+      const email = parts[1]?.trim().toLowerCase();
+      const patronStatus = parts[3]?.trim() || 'Free Member';
+      const isFreeMember = parts[5]?.trim() || 'Yes';
+      const tier = parts[10]?.trim() || 'Free';
+      const patronageSinceDate = parts[18]?.trim();
+      const userId = parts[22]?.trim() || '';
+
+      if (email && email.includes('@')) {
+        bulkOps.push({
+          updateOne: {
+            filter: { email },
+            update: {
+              $setOnInsert: {
+                name,
+                email,
+                tier,
+                patronStatus,
+                isFreeMember,
+                userId,
+                patronageSinceDate: patronageSinceDate ? new Date(patronageSinceDate) : new Date(),
+                status: 'active',
+              },
+            },
+            upsert: true,
+          },
+        });
+      }
+    }
+
+    if (bulkOps.length > 0) {
+      const result = await PatreonMember.bulkWrite(bulkOps);
+      if (result.upsertedCount > 0) {
+        console.log(`✅ Seeded ${result.upsertedCount} Patreon free members into database.`);
+      }
+    }
+  } catch (err) {
+    console.error('Error seeding Patreon members from CSV:', err);
   }
 }
 
@@ -1871,6 +1936,391 @@ app.post('/api/admin/send-email', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error('Email send error:', err);
     res.status(500).json({ error: 'Failed to send email: ' + err.message });
+  }
+});
+
+// -------------------------------------------------------------
+// 7. PATREON FREE MEMBERS MANAGEMENT & EMAIL DISPATCH
+// -------------------------------------------------------------
+
+// List Patreon Members with search, filters, pagination, and stats
+app.get('/api/admin/patreon-members', requireAdmin, async (req, res) => {
+  try {
+    const { search, tier, status, page = 1, limit = 25 } = req.query;
+
+    const query = {};
+    if (search && search.trim()) {
+      const s = search.trim();
+      query.$or = [
+        { name: { $regex: s, $options: 'i' } },
+        { email: { $regex: s, $options: 'i' } },
+        { userId: { $regex: s, $options: 'i' } },
+      ];
+    }
+
+    if (tier && tier !== 'all') {
+      query.tier = tier;
+    }
+
+    if (status && status !== 'all') {
+      query.status = status;
+    }
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, Math.min(200, parseInt(limit, 10) || 25));
+    const skip = (pageNum - 1) * limitNum;
+
+    const [total, members, totalAll, totalActive, totalEmailed] = await Promise.all([
+      PatreonMember.countDocuments(query),
+      PatreonMember.find(query).sort({ patronageSinceDate: -1, createdAt: -1 }).skip(skip).limit(limitNum),
+      PatreonMember.countDocuments(),
+      PatreonMember.countDocuments({ status: 'active' }),
+      PatreonMember.countDocuments({ 'emailsSent.0': { $exists: true } }),
+    ]);
+
+    const totalPages = Math.max(1, Math.ceil(total / limitNum));
+
+    res.json({
+      success: true,
+      total,
+      page: pageNum,
+      totalPages,
+      members,
+      stats: {
+        totalAll,
+        totalActive,
+        totalEmailed,
+      },
+    });
+  } catch (err) {
+    console.error('Fetch Patreon members error:', err);
+    res.status(500).json({ error: 'Failed to fetch Patreon members' });
+  }
+});
+
+// Add a Single Patreon Member
+app.post('/api/admin/patreon-members', requireAdmin, async (req, res) => {
+  try {
+    const { name, email, tier, patronStatus, notes } = req.body;
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ error: 'Valid email address is required.' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const existing = await PatreonMember.findOne({ email: cleanEmail });
+    if (existing) {
+      return res.status(400).json({ error: `Member with email "${cleanEmail}" already exists.` });
+    }
+
+    const member = await PatreonMember.create({
+      name: name?.trim() || 'Patreon Member',
+      email: cleanEmail,
+      tier: tier?.trim() || 'Free',
+      patronStatus: patronStatus?.trim() || 'Free Member',
+      notes: notes?.trim() || '',
+      patronageSinceDate: new Date(),
+      status: 'active',
+    });
+
+    res.json({ success: true, message: 'Patreon member created successfully!', member });
+  } catch (err) {
+    console.error('Create Patreon member error:', err);
+    res.status(500).json({ error: err.message || 'Failed to create Patreon member' });
+  }
+});
+
+// Update Patreon Member
+app.put('/api/admin/patreon-members/:id', requireAdmin, async (req, res) => {
+  try {
+    const { name, email, tier, patronStatus, status, notes } = req.body;
+    const member = await PatreonMember.findById(req.params.id);
+    if (!member) {
+      return res.status(404).json({ error: 'Patreon member not found.' });
+    }
+
+    if (email && email.trim().toLowerCase() !== member.email) {
+      const cleanEmail = email.trim().toLowerCase();
+      const existing = await PatreonMember.findOne({ email: cleanEmail });
+      if (existing && existing._id.toString() !== member._id.toString()) {
+        return res.status(400).json({ error: `Email "${cleanEmail}" is already used by another member.` });
+      }
+      member.email = cleanEmail;
+    }
+
+    if (name !== undefined) member.name = name.trim();
+    if (tier !== undefined) member.tier = tier.trim();
+    if (patronStatus !== undefined) member.patronStatus = patronStatus.trim();
+    if (status !== undefined) member.status = status;
+    if (notes !== undefined) member.notes = notes.trim();
+
+    await member.save();
+    res.json({ success: true, message: 'Member updated successfully!', member });
+  } catch (err) {
+    console.error('Update Patreon member error:', err);
+    res.status(500).json({ error: 'Failed to update member' });
+  }
+});
+
+// Delete Patreon Member
+app.delete('/api/admin/patreon-members/:id', requireAdmin, async (req, res) => {
+  try {
+    await PatreonMember.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Patreon member removed.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete Patreon member' });
+  }
+});
+
+// Export Patreon Members to CSV
+app.get('/api/admin/patreon-members/export', requireAdmin, async (req, res) => {
+  try {
+    const members = await PatreonMember.find().sort({ patronageSinceDate: -1, createdAt: -1 });
+    let csv = 'Name,Email,Tier,PatronStatus,PatronageSinceDate,Status,LastEmailedTemplate,LastEmailedAt\n';
+
+    members.forEach((m) => {
+      const lastEmail = m.emailsSent && m.emailsSent.length > 0 ? m.emailsSent[m.emailsSent.length - 1] : null;
+      const lastTpl = lastEmail ? (lastEmail.templateKey || lastEmail.subject) : '';
+      const lastSent = lastEmail && lastEmail.sentAt ? new Date(lastEmail.sentAt).toISOString() : '';
+      const since = m.patronageSinceDate ? new Date(m.patronageSinceDate).toISOString() : '';
+
+      csv += `"${(m.name || '').replace(/"/g, '""')}","${m.email}","${m.tier || 'Free'}","${m.patronStatus || 'Free Member'}","${since}","${m.status || 'active'}","${lastTpl}","${lastSent}"\n`;
+    });
+
+    res.header('Content-Type', 'text/csv');
+    res.attachment(`chibiflex-patreon-members-${Date.now()}.csv`);
+    return res.send(csv);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to export Patreon members' });
+  }
+});
+
+// Bulk Import Patreon Members via CSV text
+app.post('/api/admin/patreon-members/import-csv', requireAdmin, async (req, res) => {
+  try {
+    const { csvText } = req.body;
+    if (!csvText || !csvText.trim()) {
+      return res.status(400).json({ error: 'CSV text is required.' });
+    }
+
+    const lines = csvText.split(/\r?\n/).filter((l) => l.trim().length > 0);
+    if (lines.length === 0) {
+      return res.status(400).json({ error: 'No data rows found in CSV.' });
+    }
+
+    const headerParts = lines[0].split(',').map((h) => h.trim().toLowerCase());
+    const nameIdx = headerParts.indexOf('name') !== -1 ? headerParts.indexOf('name') : 0;
+    const emailIdx = headerParts.indexOf('email') !== -1 ? headerParts.indexOf('email') : 1;
+    const tierIdx = headerParts.indexOf('tier') !== -1 ? headerParts.indexOf('tier') : 10;
+    const statusIdx = headerParts.indexOf('patron status') !== -1 ? headerParts.indexOf('patron status') : 3;
+
+    const startRow = lines[0].toLowerCase().includes('email') ? 1 : 0;
+    const bulkOps = [];
+
+    for (let i = startRow; i < lines.length; i++) {
+      const parts = lines[i].split(',');
+      const email = parts[emailIdx]?.trim().toLowerCase();
+      if (email && email.includes('@')) {
+        const name = parts[nameIdx]?.trim() || 'Patreon Member';
+        const tier = parts[tierIdx]?.trim() || 'Free';
+        const patronStatus = parts[statusIdx]?.trim() || 'Free Member';
+
+        bulkOps.push({
+          updateOne: {
+            filter: { email },
+            update: {
+              $setOnInsert: {
+                name,
+                email,
+                tier,
+                patronStatus,
+                status: 'active',
+                patronageSinceDate: new Date(),
+              },
+            },
+            upsert: true,
+          },
+        });
+      }
+    }
+
+    if (bulkOps.length === 0) {
+      return res.status(400).json({ error: 'No valid rows with emails found.' });
+    }
+
+    const result = await PatreonMember.bulkWrite(bulkOps);
+    res.json({
+      success: true,
+      message: `Processed ${bulkOps.length} row(s). Inserted ${result.upsertedCount} new member(s).`,
+      importedCount: result.upsertedCount,
+      totalProcessed: bulkOps.length,
+    });
+  } catch (err) {
+    console.error('Patreon CSV import error:', err);
+    res.status(500).json({ error: err.message || 'Failed to import CSV' });
+  }
+});
+
+// Get Email Templates metadata
+app.get('/api/admin/patreon-members/templates', requireAdmin, async (req, res) => {
+  try {
+    const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
+    const driveLink = driveSetting ? driveSetting.value : 'https://drive.google.com';
+
+    res.json({
+      templates: PATREON_TEMPLATES,
+      driveLink,
+      patreonLink: 'https://www.patreon.com/ChibiFlex',
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch templates' });
+  }
+});
+
+// Preview Patreon Email HTML
+app.post('/api/admin/patreon-members/preview-email', requireAdmin, async (req, res) => {
+  try {
+    const { templateKey = 'try-free-models', heading, message, customNote, ctaText, sampleName = 'Alex' } = req.body;
+    const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
+    const driveLink = driveSetting ? driveSetting.value : 'https://drive.google.com';
+
+    const tpl = PATREON_TEMPLATES[templateKey] || PATREON_TEMPLATES['try-free-models'];
+    const html = renderPatreonEmail(templateKey, {
+      memberName: sampleName,
+      driveLink,
+      heading,
+      message,
+      customNote,
+      ctaText,
+    });
+
+    res.json({ success: true, html, subject: tpl.subject });
+  } catch (err) {
+    console.error('Preview error:', err);
+    res.status(500).json({ error: 'Failed to generate preview' });
+  }
+});
+
+// Send Email Campaign to Selected or All Patreon Members
+app.post('/api/admin/patreon-members/send-email', requireAdmin, async (req, res) => {
+  try {
+    const {
+      templateKey = 'try-free-models',
+      subject,
+      heading,
+      message,
+      customNote,
+      ctaText,
+      isTest,
+      testEmail,
+      recipientEmails,
+    } = req.body;
+
+    const tpl = PATREON_TEMPLATES[templateKey] || PATREON_TEMPLATES['try-free-models'];
+    const finalSubject = (subject && subject.trim()) ? subject.trim() : tpl.subject;
+
+    const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
+    const driveLink = driveSetting ? driveSetting.value : 'https://drive.google.com';
+
+    const { transporter, from } = await getMailTransporter();
+
+    // 1. Test Email flow
+    if (isTest) {
+      if (!testEmail || !testEmail.includes('@')) {
+        return res.status(400).json({ error: 'Valid test email address is required.' });
+      }
+
+      const testHtml = renderPatreonEmail(templateKey, {
+        memberName: 'Tester',
+        driveLink,
+        heading,
+        message,
+        customNote,
+        ctaText,
+      });
+
+      await transporter.sendMail({
+        from,
+        to: testEmail.trim(),
+        subject: `[TEST] ${finalSubject}`,
+        html: testHtml,
+      });
+
+      return res.json({
+        success: true,
+        message: `Test email sent successfully to ${testEmail}!`,
+      });
+    }
+
+    // 2. Real Campaign Flow
+    let targetMembers = [];
+    if (Array.isArray(recipientEmails) && recipientEmails.length > 0) {
+      const cleanList = recipientEmails.map((e) => (typeof e === 'string' ? e.trim().toLowerCase() : '')).filter((e) => e && e.includes('@'));
+      targetMembers = await PatreonMember.find({ email: { $in: cleanList }, status: 'active' });
+      const foundEmails = new Set(targetMembers.map((m) => m.email));
+      for (const e of cleanList) {
+        if (!foundEmails.has(e)) {
+          targetMembers.push({ name: 'Patreon Member', email: e });
+        }
+      }
+    } else {
+      targetMembers = await PatreonMember.find({ status: 'active' });
+    }
+
+    if (targetMembers.length === 0) {
+      return res.status(400).json({ error: 'No active Patreon recipients found to send to.' });
+    }
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const member of targetMembers) {
+      try {
+        const personalizedHtml = renderPatreonEmail(templateKey, {
+          memberName: member.name || 'Patreon Member',
+          driveLink,
+          heading,
+          message,
+          customNote,
+          ctaText,
+        });
+
+        await transporter.sendMail({
+          from,
+          to: member.email,
+          subject: finalSubject,
+          html: personalizedHtml,
+        });
+
+        successCount++;
+
+        // Record in emailsSent if member is in DB
+        if (member._id) {
+          await PatreonMember.findByIdAndUpdate(member._id, {
+            $push: {
+              emailsSent: {
+                templateKey,
+                subject: finalSubject,
+                sentAt: new Date(),
+              },
+            },
+          });
+        }
+      } catch (sendErr) {
+        console.error(`[Patreon Email] Failed to send to ${member.email}:`, sendErr.message);
+        failCount++;
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Patreon campaign complete! Sent to ${successCount} member(s).${failCount > 0 ? ` (${failCount} failed)` : ''}`,
+      sentCount: successCount,
+      failedCount: failCount,
+      totalTargeted: targetMembers.length,
+    });
+  } catch (err) {
+    console.error('Patreon campaign dispatch error:', err);
+    res.status(500).json({ error: err.message || 'Failed to dispatch Patreon emails.' });
   }
 });
 
