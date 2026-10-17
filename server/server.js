@@ -108,6 +108,22 @@ async function initDefaults() {
     });
   }
 
+  const followUpSetting = await Setting.findOne({ key: 'followUpEmailSettings' });
+  if (!followUpSetting) {
+    await Setting.create({
+      key: 'followUpEmailSettings',
+      value: {
+        enabled: true,
+        delayDays: 4,
+        subject: '🧸 Did you get a chance to print your Chibi Flex models yet? (+ exclusive designs waiting!)',
+        heading: 'How Did Your 3D Prints Turn Out? 🖨️✨',
+        message: "Hey there!\n\nIt's been a few days since you downloaded your free Chibi Flex articulated 3MF models. We hope they printed smoothly on your build plate!\n\nDid your flexi joints move freely? We'd love to hear how your prints turned out. If you've enjoyed these models, you will absolutely LOVE what we have inside our Patreon community!",
+        patreonPitch: "Every month, our members get:\n⭐ 5+ Brand-New Exclusive Articulated Designs\n💼 Commercial License (Sell physical 3D prints of all our models!)\n🎁 Instant Access to the Giant Welcome Pack (20+ premium designs)\n🗳️ Vote on upcoming monthly models in community design polls",
+        customNote: '',
+      },
+    });
+  }
+
   // Initialize activeMonthlyRelease setting if none exists
   const activeReleaseSetting = await Setting.findOne({ key: 'activeMonthlyRelease' });
   if (!activeReleaseSetting) {
@@ -635,10 +651,266 @@ async function sendThankYouEmail(toEmail, driveLink) {
     });
 
     console.log(`[Thank You Email] Successfully sent to ${toEmail}. Message ID: ${info.messageId}`);
+    try {
+      await Subscriber.updateOne(
+        { email: toEmail.toLowerCase().trim() },
+        { $set: { thankYouEmailSentAt: new Date() } }
+      );
+    } catch (e) {}
     return { success: true, messageId: info.messageId };
   } catch (err) {
     console.error(`[Thank You Email] Failed to send to ${toEmail}:`, err.message || err);
     return { success: false, error: err.message };
+  }
+}
+
+// -------------------------------------------------------------
+// DAY 4 FOLLOW-UP & PATREON UPSELL EMAIL TEMPLATE & DISPATCH
+// -------------------------------------------------------------
+function getFollowUpHtmlEmail(options = {}) {
+  const currentYear = new Date().getFullYear();
+  const safeDriveLink = options.driveLink || 'https://drive.google.com';
+  const patreonLink = options.patreonLink || 'https://www.patreon.com/ChibiFlex';
+  const heading = options.heading || 'How Did Your 3D Prints Turn Out? 🖨️✨';
+  const message = options.message || "Hey there!\n\nIt's been a few days since you downloaded your free Chibi Flex articulated 3MF models. We hope they printed smoothly on your build plate!\n\nDid your flexi joints move freely? We'd love to see photos of your makes! If you enjoyed these models, you're going to love what we have inside our Patreon community.";
+  const patreonPitch = options.patreonPitch || "Every month, our members get:\n⭐ 5+ Brand-New Exclusive Articulated Designs\n💼 Commercial License (Sell physical 3D prints of all our models!)\n🎁 Instant Access to the Giant Welcome Pack (20+ premium designs)\n🗳️ Vote on upcoming monthly models in community design polls";
+  const customNote = options.customNote || '';
+
+  // Format message lines into paragraphs
+  const messageHtml = message
+    .split('\n\n')
+    .filter((p) => p.trim())
+    .map((p) => `<p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.65; color: #cbd5e1;">${p.replace(/\n/g, '<br>').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;br&gt;/g, '<br>')}</p>`)
+    .join('');
+
+  // Format patreon perks into styled list
+  const perksHtml = patreonPitch
+    .split('\n')
+    .filter((line) => line.trim())
+    .map((line) => {
+      const clean = line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `
+        <tr>
+          <td style="padding: 7px 0; font-size: 14px; color: #f1f5f9; line-height: 1.5;">
+            ${clean}
+          </td>
+        </tr>
+      `;
+    })
+    .join('');
+
+  const customNoteHtml = customNote && customNote.trim()
+    ? `
+      <div style="background: rgba(236, 72, 153, 0.1); border-left: 4px solid #ec4899; padding: 14px 18px; border-radius: 8px; margin: 22px 0; text-align: left;">
+        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #fbcfe8; font-style: italic;">
+          "${customNote.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}"
+        </p>
+      </div>
+    `
+    : '';
+
+  return `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${heading}</title>
+  </head>
+  <body style="margin: 0; padding: 0; background-color: #0b0c10; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ffffff;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #0b0c10; padding: 40px 15px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" style="max-width: 580px; background: linear-gradient(145deg, #151722, #0d0f17); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.75);" cellspacing="0" cellpadding="0" border="0">
+            <!-- Header -->
+            <tr>
+              <td style="padding: 35px 35px 22px 35px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff;">
+                  🧸 <span style="background: linear-gradient(135deg, #00d2ff, #3a7bd5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Chibi Flex</span>
+                </h1>
+                <p style="margin: 6px 0 0 0; font-size: 13px; color: #94a3b8; letter-spacing: 0.5px; text-transform: uppercase;">Articulated 3D Printable Flexi Models</p>
+              </td>
+            </tr>
+
+            <!-- Main Content -->
+            <tr>
+              <td style="padding: 35px 35px 25px 35px; text-align: center;">
+                <div style="display: inline-block; width: 60px; height: 60px; line-height: 60px; border-radius: 50%; background: rgba(236, 72, 153, 0.15); border: 1px solid rgba(236, 72, 153, 0.4); font-size: 30px; margin-bottom: 20px;">
+                  🖨️
+                </div>
+                <h2 style="margin: 0 0 16px 0; font-size: 23px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">
+                  ${heading.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+                </h2>
+
+                <div style="text-align: left; margin-bottom: 20px;">
+                  ${messageHtml}
+                </div>
+
+                ${customNoteHtml}
+
+                <!-- Patreon Mega Card (Urgent & Compelling) -->
+                <div style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.14), rgba(168, 85, 247, 0.14)); border: 2px solid rgba(236, 72, 153, 0.45); border-radius: 18px; padding: 26px; text-align: center; margin: 26px 0;">
+                  <span style="display: inline-block; background: rgba(236, 72, 153, 0.25); color: #f472b6; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; padding: 5px 14px; border-radius: 20px; margin-bottom: 10px;">
+                    🔥 Exclusive Patreon Membership
+                  </span>
+                  <h3 style="margin: 4px 0 12px 0; font-size: 20px; font-weight: 800; color: #ffffff;">
+                    Ready To Sell 3D Prints & Unlock 20+ Models?
+                  </h3>
+                  
+                  <div style="background: rgba(0, 0, 0, 0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 22px; text-align: left;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      ${perksHtml}
+                    </table>
+                  </div>
+
+                  <!-- Big CTA Button -->
+                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+                    <tr>
+                      <td align="center" style="border-radius: 12px; background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%); box-shadow: 0 10px 25px rgba(236, 72, 153, 0.4);">
+                        <a href="${patreonLink}" target="_blank" style="padding: 16px 36px; border-radius: 12px; font-size: 16px; font-weight: 800; color: #ffffff; text-decoration: none; display: inline-block; letter-spacing: 0.3px;">
+                          ⭐ JOIN CHIBIFLEX PATREON NOW &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                  <p style="margin: 12px 0 0 0; font-size: 12.5px; color: #cbd5e1;">Instant access to download everything right away!</p>
+                </div>
+
+                <!-- Free Models Reminder Box -->
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px 20px; text-align: center; margin-top: 15px;">
+                  <p style="margin: 0 0 8px 0; font-size: 13.5px; color: #94a3b8;">
+                    Need to re-download your complimentary free models?
+                  </p>
+                  <a href="${safeDriveLink}" target="_blank" style="color: #00d2ff; font-weight: 700; font-size: 13.5px; text-decoration: underline;">
+                    📥 Open Google Drive Free Models Folder &rarr;
+                  </a>
+                </div>
+
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="padding: 24px 35px; background-color: rgba(0, 0, 0, 0.35); border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center;">
+                <p style="margin: 0 0 8px 0; font-size: 13px; color: #94a3b8; font-weight: 600;">
+                  Happy 3D Printing! ❤️ The Chibi Flex Team
+                </p>
+                <p style="margin: 0 0 8px 0; font-size: 11.5px; color: #64748b; line-height: 1.5;">
+                  You received this email because you downloaded free 3D models on <a href="https://chibiflex.com" style="color: #64748b; text-decoration: underline;">chibiflex.com</a>.
+                </p>
+                <p style="margin: 0; font-size: 11.5px; color: #475569;">
+                  &copy; ${currentYear} Chibi Flex. All rights reserved.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `;
+}
+
+async function sendFollowUpEmail(toEmail, driveLink, customOptions = {}) {
+  if (!toEmail) return { success: false, reason: 'no-email' };
+  try {
+    const followUpSetting = await Setting.findOne({ key: 'followUpEmailSettings' });
+    const settings = {
+      ...(followUpSetting?.value || {}),
+      ...customOptions,
+    };
+
+    if (customOptions.force !== true && settings.enabled === false) {
+      console.log(`[Follow-Up Email] Disabled in settings; skipping dispatch to ${toEmail}.`);
+      return { success: false, reason: 'disabled' };
+    }
+
+    const { transporter, from } = await getMailTransporter();
+    let finalDriveLink = driveLink || customOptions.driveLink;
+    if (!finalDriveLink) {
+      const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
+      finalDriveLink = driveSetting ? driveSetting.value : 'https://drive.google.com';
+    }
+
+    const subject = settings.subject && settings.subject.trim()
+      ? settings.subject.trim()
+      : '🧸 Did you get a chance to print your Chibi Flex models yet? (+ exclusive designs waiting!)';
+
+    const html = getFollowUpHtmlEmail({
+      ...settings,
+      driveLink: finalDriveLink,
+      patreonLink: settings.patreonLink || 'https://www.patreon.com/ChibiFlex',
+    });
+
+    const info = await transporter.sendMail({
+      from,
+      to: toEmail,
+      subject,
+      html,
+    });
+
+    console.log(`[Follow-Up Email] Successfully sent to ${toEmail}. Message ID: ${info.messageId}`);
+    return { success: true, messageId: info.messageId };
+  } catch (err) {
+    console.error(`[Follow-Up Email] Failed to send to ${toEmail}:`, err.message || err);
+    return { success: false, error: err.message };
+  }
+}
+
+// Automated Cron: Find and process subscribers due for follow-up email
+async function processFollowUpEmails() {
+  try {
+    const followUpSetting = await Setting.findOne({ key: 'followUpEmailSettings' });
+    const settings = followUpSetting?.value || { enabled: true, delayDays: 4 };
+
+    if (settings.enabled === false) {
+      return { processed: 0, reason: 'disabled' };
+    }
+
+    const delayDays = Number(settings.delayDays) >= 0 ? Number(settings.delayDays) : 4;
+    const cutoffDate = new Date(Date.now() - delayDays * 24 * 60 * 60 * 1000);
+
+    // Eligible: active subscribers whose subscribedAt <= cutoffDate, and followUpEmailSentAt is null
+    const pendingSubscribers = await Subscriber.find({
+      status: 'active',
+      isVerified: true,
+      followUpEmailSentAt: { $exists: false },
+      subscribedAt: { $lte: cutoffDate },
+    }).limit(50);
+
+    if (pendingSubscribers.length === 0) {
+      return { processed: 0, totalEligible: 0, message: 'No subscribers due for follow-up.' };
+    }
+
+    console.log(`[Follow-Up Cron] Found ${pendingSubscribers.length} subscriber(s) due for Day ${delayDays} follow-up.`);
+
+    const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
+    const driveLink = driveSetting ? driveSetting.value : 'https://drive.google.com';
+
+    let sentCount = 0;
+    for (const sub of pendingSubscribers) {
+      try {
+        const res = await sendFollowUpEmail(sub.email, driveLink);
+        if (res.success) {
+          sub.followUpEmailSentAt = new Date();
+          sub.followUpEmailStatus = 'sent';
+          await sub.save();
+          sentCount++;
+        } else {
+          sub.followUpEmailStatus = 'failed';
+          await sub.save();
+        }
+      } catch (subErr) {
+        console.error(`[Follow-Up Cron] Error processing ${sub.email}:`, subErr);
+      }
+    }
+
+    console.log(`[Follow-Up Cron] Completed dispatch to ${sentCount}/${pendingSubscribers.length} subscribers.`);
+    return { processed: sentCount, totalEligible: pendingSubscribers.length };
+  } catch (err) {
+    console.error('[Follow-Up Cron] Error:', err);
+    return { error: err.message };
   }
 }
 
@@ -1185,6 +1457,7 @@ app.get('/api/settings', requireAdmin, async (req, res) => {
     const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
     const smtpSetting = await Setting.findOne({ key: 'smtpSettings' });
     const thankYouSetting = await Setting.findOne({ key: 'thankYouEmailSettings' });
+    const followUpSetting = await Setting.findOne({ key: 'followUpEmailSettings' });
 
     res.json({
       googleDriveLink: driveSetting ? driveSetting.value : '',
@@ -1192,6 +1465,15 @@ app.get('/api/settings', requireAdmin, async (req, res) => {
       thankYouEmailSettings: thankYouSetting?.value || {
         enabled: true,
         subject: '🎁 Your Free Chibi Flex 3D Models Are Ready To Download!',
+        customNote: '',
+      },
+      followUpEmailSettings: followUpSetting?.value || {
+        enabled: true,
+        delayDays: 4,
+        subject: '🧸 Did you get a chance to print your Chibi Flex models yet? (+ exclusive designs waiting!)',
+        heading: 'How Did Your 3D Prints Turn Out? 🖨️✨',
+        message: "Hey there!\n\nIt's been a few days since you downloaded your free Chibi Flex articulated 3MF models. We hope they printed smoothly on your build plate!\n\nDid your flexi joints move freely? We'd love to hear how your prints turned out. If you've enjoyed these models, you will absolutely LOVE what we have inside our Patreon community!",
+        patreonPitch: "Every month, our members get:\n⭐ 5+ Brand-New Exclusive Articulated Designs\n💼 Commercial License (Sell physical 3D prints of all our models!)\n🎁 Instant Access to the Giant Welcome Pack (20+ premium designs)\n🗳️ Vote on upcoming monthly models in community design polls",
         customNote: '',
       },
     });
@@ -1202,7 +1484,7 @@ app.get('/api/settings', requireAdmin, async (req, res) => {
 
 app.put('/api/settings', requireAdmin, async (req, res) => {
   try {
-    const { googleDriveLink, smtpSettings, thankYouEmailSettings, newPassword } = req.body;
+    const { googleDriveLink, smtpSettings, thankYouEmailSettings, followUpEmailSettings, newPassword } = req.body;
 
     if (googleDriveLink !== undefined) {
       await Setting.findOneAndUpdate(
@@ -1224,6 +1506,14 @@ app.put('/api/settings', requireAdmin, async (req, res) => {
       await Setting.findOneAndUpdate(
         { key: 'thankYouEmailSettings' },
         { value: thankYouEmailSettings },
+        { upsert: true }
+      );
+    }
+
+    if (followUpEmailSettings !== undefined) {
+      await Setting.findOneAndUpdate(
+        { key: 'followUpEmailSettings' },
+        { value: followUpEmailSettings },
         { upsert: true }
       );
     }
@@ -1286,6 +1576,201 @@ app.get('/api/admin/preview-thank-you-email', requireAdmin, async (req, res) => 
     res.send(html);
   } catch (err) {
     res.status(500).send('Error generating email preview');
+  }
+});
+
+// Admin: Send Thank You Email to Custom Email(s)
+app.post('/api/admin/send-thank-you-custom', requireAdmin, async (req, res) => {
+  try {
+    const { emails, subject, customNote } = req.body;
+    if (!Array.isArray(emails) || emails.length === 0) {
+      return res.status(400).json({ error: 'Please provide at least one recipient email address.' });
+    }
+
+    const cleanEmails = emails
+      .map((e) => String(e).trim().toLowerCase())
+      .filter((e) => e && e.includes('@'));
+
+    if (cleanEmails.length === 0) {
+      return res.status(400).json({ error: 'No valid recipient email addresses found.' });
+    }
+
+    const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
+    const driveLink = driveSetting ? driveSetting.value : 'https://drive.google.com';
+
+    const thankYouSetting = await Setting.findOne({ key: 'thankYouEmailSettings' });
+    const settings = thankYouSetting?.value || {};
+
+    const finalSubject = subject && subject.trim() ? subject.trim() : (settings.subject || '🎁 Your Free Chibi Flex 3D Models Are Ready To Download!');
+    const finalNote = customNote !== undefined ? customNote : (settings.customNote || '');
+
+    const { transporter, from } = await getMailTransporter();
+    const html = getThankYouHtmlEmail(driveLink, finalNote);
+
+    let sentCount = 0;
+    let failedCount = 0;
+
+    for (const em of cleanEmails) {
+      try {
+        await transporter.sendMail({
+          from,
+          to: em,
+          subject: finalSubject,
+          html,
+        });
+        sentCount++;
+        await Subscriber.updateOne(
+          { email: em },
+          { $set: { thankYouEmailSentAt: new Date() } }
+        );
+      } catch (e) {
+        console.error(`Failed to send thank you email to ${em}:`, e);
+        failedCount++;
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Thank You email dispatched to ${sentCount} recipient(s)${failedCount > 0 ? ` (${failedCount} failed)` : ''}.`,
+      sentCount,
+      failedCount,
+    });
+  } catch (err) {
+    console.error('Send custom thank you error:', err);
+    res.status(500).json({ error: err.message || 'Failed to dispatch emails.' });
+  }
+});
+
+// Admin: Send Test Follow-Up Email
+app.post('/api/admin/test-follow-up-email', requireAdmin, async (req, res) => {
+  try {
+    const { testEmail, subject, heading, message, patreonPitch, customNote } = req.body;
+    if (!testEmail || !testEmail.includes('@')) {
+      return res.status(400).json({ error: 'Valid test email address is required.' });
+    }
+
+    const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
+    const driveLink = driveSetting ? driveSetting.value : 'https://drive.google.com';
+
+    const { transporter, from } = await getMailTransporter();
+    const finalSubject = subject && subject.trim()
+      ? (subject.startsWith('[TEST]') ? subject.trim() : `[TEST] ${subject.trim()}`)
+      : '[TEST] 🧸 Did you get a chance to print your Chibi Flex models yet?';
+
+    const html = getFollowUpHtmlEmail({
+      driveLink,
+      heading,
+      message,
+      patreonPitch,
+      customNote,
+    });
+
+    await transporter.sendMail({
+      from,
+      to: testEmail.trim(),
+      subject: finalSubject,
+      html,
+    });
+
+    res.json({ success: true, message: `Test Follow-up email sent successfully to ${testEmail}!` });
+  } catch (err) {
+    console.error('Test follow-up email error:', err);
+    res.status(500).json({ error: err.message || 'Failed to send test follow-up email.' });
+  }
+});
+
+// Admin: Preview Follow-Up Email HTML
+app.get('/api/admin/preview-follow-up-email', requireAdmin, async (req, res) => {
+  try {
+    const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
+    const driveLink = driveSetting ? driveSetting.value : 'https://drive.google.com';
+    const followUpSetting = await Setting.findOne({ key: 'followUpEmailSettings' });
+    const settings = followUpSetting?.value || {};
+    const html = getFollowUpHtmlEmail({
+      ...settings,
+      driveLink,
+    });
+    res.setHeader('Content-Type', 'text/html');
+    res.send(html);
+  } catch (err) {
+    res.status(500).send('Error generating email preview');
+  }
+});
+
+// Admin: Send Follow-Up Email to Custom Email(s)
+app.post('/api/admin/send-follow-up-custom', requireAdmin, async (req, res) => {
+  try {
+    const { emails, subject, heading, message, patreonPitch, customNote } = req.body;
+    if (!Array.isArray(emails) || emails.length === 0) {
+      return res.status(400).json({ error: 'Please provide at least one recipient email address.' });
+    }
+
+    const cleanEmails = emails
+      .map((e) => String(e).trim().toLowerCase())
+      .filter((e) => e && e.includes('@'));
+
+    if (cleanEmails.length === 0) {
+      return res.status(400).json({ error: 'No valid recipient email addresses found.' });
+    }
+
+    const driveSetting = await Setting.findOne({ key: 'googleDriveLink' });
+    const driveLink = driveSetting ? driveSetting.value : 'https://drive.google.com';
+
+    const followUpSetting = await Setting.findOne({ key: 'followUpEmailSettings' });
+    const defaults = followUpSetting?.value || {};
+
+    const finalSubject = subject && subject.trim() ? subject.trim() : (defaults.subject || '🧸 Did you get a chance to print your Chibi Flex models yet?');
+    const { transporter, from } = await getMailTransporter();
+
+    const html = getFollowUpHtmlEmail({
+      driveLink,
+      heading: heading || defaults.heading,
+      message: message || defaults.message,
+      patreonPitch: patreonPitch || defaults.patreonPitch,
+      customNote: customNote !== undefined ? customNote : defaults.customNote,
+    });
+
+    let sentCount = 0;
+    let failedCount = 0;
+
+    for (const em of cleanEmails) {
+      try {
+        await transporter.sendMail({
+          from,
+          to: em,
+          subject: finalSubject,
+          html,
+        });
+        sentCount++;
+        await Subscriber.updateOne(
+          { email: em },
+          { $set: { followUpEmailSentAt: new Date(), followUpEmailStatus: 'sent' } }
+        );
+      } catch (e) {
+        console.error(`Failed to send follow-up email to ${em}:`, e);
+        failedCount++;
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Follow-up email dispatched to ${sentCount} recipient(s)${failedCount > 0 ? ` (${failedCount} failed)` : ''}.`,
+      sentCount,
+      failedCount,
+    });
+  } catch (err) {
+    console.error('Send custom follow-up error:', err);
+    res.status(500).json({ error: err.message || 'Failed to dispatch follow-up emails.' });
+  }
+});
+
+// Admin: Trigger Follow-Up Check Immediately
+app.post('/api/admin/run-follow-up-now', requireAdmin, async (req, res) => {
+  try {
+    const result = await processFollowUpEmails();
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Failed to execute follow-up check.' });
   }
 });
 
@@ -1407,6 +1892,9 @@ async function startServer() {
 
     app.listen(PORT, () => {
       console.log(`🚀 ChibiFlex API Server running on port ${PORT}`);
+      // Launch automated follow-up check (initial check in 15 seconds, then recurring every 30 minutes)
+      setTimeout(processFollowUpEmails, 15000);
+      setInterval(processFollowUpEmails, 30 * 60 * 1000);
     });
   } catch (err) {
     console.error('❌ Server startup error:', err);

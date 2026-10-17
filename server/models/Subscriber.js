@@ -25,6 +25,16 @@ const subscriberSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  thankYouEmailSentAt: {
+    type: Date,
+  },
+  followUpEmailSentAt: {
+    type: Date,
+  },
+  followUpEmailStatus: {
+    type: String,
+    default: 'pending',
+  },
 });
 
 export const Subscriber = mongoose.model('Subscriber', subscriberSchema, 'subscribers');

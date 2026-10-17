@@ -1529,6 +1529,127 @@
                   <i class="fa-solid fa-eye"></i>
                   <span>Preview Email</span>
                 </button>
+
+                <button type="button" id="thankyou-custom-send-btn" class="btn btn-secondary" style="background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.4); color: var(--accent-purple);">
+                  <i class="fa-solid fa-share-from-square"></i>
+                  <span>Send to Custom Email(s)</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Automated Day 4 Follow-Up & Patreon Upsell Email -->
+          <div class="card-box" style="margin-bottom: 2rem;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+              <div>
+                <h3 class="card-title">🧸 Automated Follow-Up & Patreon Upsell Email (Print Check-In)</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                  Sent automatically ~4 days after download. Asks if they printed the free models, requests photos/feedback, and urges them to join Patreon for 5+ new monthly designs & commercial selling license!
+                </p>
+              </div>
+              <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; background: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.3); padding: 6px 14px; border-radius: var(--radius-full);">
+                <input type="checkbox" id="followup-enabled" checked style="width: 17px; height: 17px; accent-color: var(--accent-pink); cursor: pointer;" />
+                <span id="followup-status-label" style="font-weight: 700; font-size: 0.88rem; color: var(--accent-pink);">Follow-Up Active</span>
+              </label>
+            </div>
+
+            <form id="followup-settings-form">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="followup-days">Delay Days After Download *</label>
+                  <input
+                    type="number"
+                    id="followup-days"
+                    class="form-input"
+                    min="1"
+                    max="60"
+                    value="4"
+                    required
+                  />
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">Default: 4 days after email verified</span>
+                </div>
+                <div class="form-group" style="margin-bottom: 0; grid-column: span 2;">
+                  <label class="form-label" for="followup-subject">Email Subject Line *</label>
+                  <input
+                    type="text"
+                    id="followup-subject"
+                    class="form-input"
+                    placeholder="🧸 Did you get a chance to print your Chibi Flex models yet? (+ exclusive designs waiting!)"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="followup-heading">Email Inner Headline *</label>
+                <input
+                  type="text"
+                  id="followup-heading"
+                  class="form-input"
+                  placeholder="How Did Your 3D Prints Turn Out? 🖨️✨"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="followup-message">Main Check-In Message Body *</label>
+                <textarea
+                  id="followup-message"
+                  class="form-textarea"
+                  rows="3"
+                  placeholder="Hey there! It's been a few days since you downloaded your free Chibi Flex articulated 3MF models..."
+                  required
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="followup-pitch">Patreon Perks & Value Pitch * (One bullet per line)</label>
+                <textarea
+                  id="followup-pitch"
+                  class="form-textarea"
+                  rows="3"
+                  placeholder="⭐ 5+ Brand-New Exclusive Articulated Designs Every Month&#10;💼 Commercial License (Sell physical 3D prints!)&#10;🎁 Instant Access to Giant Welcome Pack (20+ designs)&#10;🗳️ Vote on upcoming designs"
+                  required
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="followup-note">
+                  Custom Highlight Note <span style="color: var(--text-muted); font-weight: 400;">(Optional callout box)</span>
+                </label>
+                <input
+                  type="text"
+                  id="followup-note"
+                  class="form-input"
+                  placeholder="e.g. Need help with slicing? Just reply directly to this email!"
+                />
+              </div>
+
+              <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <button type="submit" class="btn btn-secondary">
+                  <i class="fa-solid fa-floppy-disk"></i>
+                  <span>Save Follow-Up Settings</span>
+                </button>
+
+                <button type="button" id="followup-test-btn" class="btn btn-secondary" style="background: rgba(236, 72, 153, 0.15); border-color: rgba(236, 72, 153, 0.4); color: var(--accent-pink);">
+                  <i class="fa-solid fa-paper-plane"></i>
+                  <span>Send Test Email</span>
+                </button>
+
+                <button type="button" id="followup-preview-btn" class="btn btn-secondary" style="background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.15);">
+                  <i class="fa-solid fa-eye"></i>
+                  <span>Preview Email</span>
+                </button>
+
+                <button type="button" id="followup-custom-send-btn" class="btn btn-secondary" style="background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.4); color: var(--accent-purple);">
+                  <i class="fa-solid fa-share-from-square"></i>
+                  <span>Send to Custom Email(s)</span>
+                </button>
+
+                <button type="button" id="followup-run-now-btn" class="btn btn-secondary" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: var(--accent-emerald);">
+                  <i class="fa-solid fa-bolt"></i>
+                  <span>Check & Run Auto Follow-Ups Now</span>
+                </button>
               </div>
             </form>
           </div>
@@ -1539,7 +1660,7 @@
               <div>
                 <h3 class="card-title">Campaign Recipients & Targeting</h3>
                 <p style="color: var(--text-muted); font-size: 0.9rem;">
-                  Choose whether to broadcast to everyone or select specific subscribers from the table below.
+                  Choose whether to broadcast to everyone, select specific subscribers from the table, or type custom emails.
                 </p>
               </div>
               <span style="color: var(--accent-pink); font-size: 0.9rem; font-weight: 700;">
@@ -1574,6 +1695,38 @@
                   </span>
                 </div>
               </label>
+
+              <label class="audience-card" id="card-aud-custom">
+                <input type="radio" name="mkt-audience-type" value="custom" />
+                <div>
+                  <div style="font-weight: 700; font-size: 1rem; margin-bottom: 4px;">Custom / Manual Email Addresses</div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+                    Type or paste any specific recipient email addresses directly.
+                  </div>
+                  <span class="model-badge" id="badge-custom-count" style="background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan);">
+                    0 Entered
+                  </span>
+                </div>
+              </label>
+            </div>
+
+            <!-- Custom Recipient Emails Box -->
+            <div id="mkt-custom-emails-picker" style="display: none; border-top: 1px solid var(--border-subtle); padding-top: 1.5rem; margin-top: 1rem;">
+              <div class="form-group" style="margin-bottom: 0.5rem;">
+                <label class="form-label" for="mkt-custom-emails-input">
+                  <i class="fa-solid fa-at" style="color: var(--accent-cyan); margin-right: 6px;"></i>
+                  Type Recipient Email Addresses
+                </label>
+                <textarea
+                  id="mkt-custom-emails-input"
+                  class="form-textarea"
+                  rows="3"
+                  placeholder="Enter emails separated by commas, spaces, or new lines...&#10;e.g. user1@gmail.com, printlover@outlook.com"
+                ></textarea>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+                <i class="fa-solid fa-check-circle" style="color: var(--accent-emerald);"></i> Valid recipient emails found: <strong id="mkt-custom-detected-count" style="color: #ffffff;">0</strong>
+              </p>
             </div>
 
             <!-- Subscribers Selection Table Section -->
@@ -1867,6 +2020,44 @@
             <button type="button" class="btn btn-secondary" onclick="closeRolloverModal()">Cancel</button>
             <button type="submit" class="btn btn-primary" id="rollover-submit-btn" style="width: auto;">
               <i class="fa-solid fa-arrows-rotate"></i> Launch New Monthly Drop
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Send Custom Email Modal -->
+    <div id="custom-email-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+      <div class="card-box" style="max-width: 560px; width: 100%; border: 1px solid var(--border-glow); box-shadow: 0 25px 60px rgba(0,0,0,0.85); background: #12141c;">
+        <div class="card-header" style="margin-bottom: 1.25rem;">
+          <h3 class="card-title" id="custom-email-modal-title">
+            <i class="fa-solid fa-paper-plane" style="color: var(--accent-cyan);"></i> Send Email to Anyone
+          </h3>
+          <button type="button" class="btn btn-secondary" style="padding: 6px 12px;" onclick="closeCustomEmailModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem;" id="custom-email-modal-desc">
+          Enter one or more email addresses to immediately send this email template.
+        </p>
+        <form id="custom-email-modal-form">
+          <input type="hidden" id="custom-email-modal-type" value="thankyou" />
+          <div class="form-group">
+            <label class="form-label" for="custom-modal-recipients">Recipient Email Address(es) *</label>
+            <textarea
+              id="custom-modal-recipients"
+              class="form-textarea"
+              rows="3"
+              placeholder="Enter emails (separated by commas, spaces, or lines)...&#10;e.g. user1@gmail.com, printlover@outlook.com"
+              required
+            ></textarea>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Multiple emails can be separated by commas or line breaks.</span>
+          </div>
+          <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeCustomEmailModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="custom-modal-submit-btn" style="width: auto;">
+              <i class="fa-solid fa-paper-plane"></i>
+              <span id="custom-modal-submit-text">Send Email Now</span>
             </button>
           </div>
         </form>
@@ -3085,30 +3276,76 @@
         }
       }
 
+      // Helper: Parse valid emails from arbitrary text
+      function parseEmailsFromText(text) {
+        if (!text) return [];
+        const raw = text.split(/[\s,;\n\r]+/);
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const unique = new Set();
+        raw.forEach((item) => {
+          const clean = item.trim().toLowerCase();
+          if (clean && emailRegex.test(clean)) {
+            unique.add(clean);
+          }
+        });
+        return Array.from(unique);
+      }
+
       // Audience Mode Switcher
       function updateAudienceDisplay() {
         const isSelectedMode = mktAudienceType === 'selected';
+        const isCustomMode = mktAudienceType === 'custom';
+        const isAllMode = mktAudienceType === 'all';
+
         const cardAll = document.getElementById('card-aud-all');
         const cardSelected = document.getElementById('card-aud-selected');
+        const cardCustom = document.getElementById('card-aud-custom');
+
         const pickerPanel = document.getElementById('mkt-subscribers-picker');
+        const customEmailsPanel = document.getElementById('mkt-custom-emails-picker');
+
         const summaryBanner = document.getElementById('mkt-target-summary-banner');
         const summaryText = document.getElementById('mkt-target-summary-text');
         const broadcastBtnText = document.getElementById('broadcast-btn-text');
 
-        if (cardAll) cardAll.classList.toggle('active', !isSelectedMode);
+        if (cardAll) cardAll.classList.toggle('active', isAllMode);
         if (cardSelected) cardSelected.classList.toggle('active', isSelectedMode);
+        if (cardCustom) cardCustom.classList.toggle('active', isCustomMode);
 
         if (pickerPanel) {
           pickerPanel.style.display = isSelectedMode ? 'block' : 'none';
         }
+        if (customEmailsPanel) {
+          customEmailsPanel.style.display = isCustomMode ? 'block' : 'none';
+        }
 
         const totalActive = allSubscribers.length;
         const selectedCount = mktSelectedEmails.size;
+        const customText = document.getElementById('mkt-custom-emails-input')?.value || '';
+        const customEmails = parseEmailsFromText(customText);
+        const customCount = customEmails.length;
 
-        if (isSelectedMode) {
+        const badgeSelected = document.getElementById('badge-selected-count');
+        if (badgeSelected) badgeSelected.textContent = `${selectedCount} Selected`;
+
+        const badgeCustom = document.getElementById('badge-custom-count');
+        if (badgeCustom) badgeCustom.textContent = `${customCount} Entered`;
+
+        const detectedCountEl = document.getElementById('mkt-custom-detected-count');
+        if (detectedCountEl) detectedCountEl.textContent = customCount;
+
+        if (isCustomMode) {
           if (summaryBanner) summaryBanner.className = 'alert-banner cyan';
           if (summaryText) {
-            summaryText.innerHTML = `Target: <strong>${selectedCount} Selected Subscriber(s)</strong> (custom audience mode)`;
+            summaryText.innerHTML = `Target: <strong>${customCount} Custom Recipient(s)</strong> (typed / pasted email list)`;
+          }
+          if (broadcastBtnText) {
+            broadcastBtnText.textContent = `Send to ${customCount} Custom Recipient${customCount === 1 ? '' : 's'}`;
+          }
+        } else if (isSelectedMode) {
+          if (summaryBanner) summaryBanner.className = 'alert-banner purple';
+          if (summaryText) {
+            summaryText.innerHTML = `Target: <strong>${selectedCount} Selected Subscriber(s)</strong> (table audience mode)`;
           }
           if (broadcastBtnText) {
             broadcastBtnText.textContent = `Send to ${selectedCount} Selected Subscriber${selectedCount === 1 ? '' : 's'}`;
@@ -3122,11 +3359,6 @@
             broadcastBtnText.textContent = `Send to All Subscribers (${totalActive})`;
           }
         }
-
-        const badgeSelected = document.getElementById('badge-selected-count');
-        if (badgeSelected) {
-          badgeSelected.textContent = `${selectedCount} Selected`;
-        }
       }
 
       // Audience Radio Inputs
@@ -3136,6 +3368,14 @@
           updateAudienceDisplay();
         });
       });
+
+      // Custom Emails Textarea Input Listener
+      const customEmailsInput = document.getElementById('mkt-custom-emails-input');
+      if (customEmailsInput) {
+        customEmailsInput.addEventListener('input', () => {
+          updateAudienceDisplay();
+        });
+      }
 
       // Recipient Master Checkbox
       const masterCheck = document.getElementById('mkt-master-check');
@@ -3374,6 +3614,29 @@
               document.getElementById('thankyou-subject').value = ty.subject || '';
               document.getElementById('thankyou-note').value = ty.customNote || '';
             }
+            if (data.followUpEmailSettings) {
+              const fu = data.followUpEmailSettings;
+              const isEn = fu.enabled !== false;
+              const fuEnabledCheck = document.getElementById('followup-enabled');
+              if (fuEnabledCheck) fuEnabledCheck.checked = isEn;
+              const statusLbl = document.getElementById('followup-status-label');
+              if (statusLbl) {
+                statusLbl.textContent = isEn ? 'Follow-Up Active' : 'Follow-Up Paused';
+                statusLbl.style.color = isEn ? 'var(--accent-pink)' : 'var(--text-muted)';
+              }
+              const daysEl = document.getElementById('followup-days');
+              if (daysEl) daysEl.value = fu.delayDays || 4;
+              const subjEl = document.getElementById('followup-subject');
+              if (subjEl) subjEl.value = fu.subject || '';
+              const headEl = document.getElementById('followup-heading');
+              if (headEl) headEl.value = fu.heading || '';
+              const msgEl = document.getElementById('followup-message');
+              if (msgEl) msgEl.value = fu.message || '';
+              const pitchEl = document.getElementById('followup-pitch');
+              if (pitchEl) pitchEl.value = fu.patreonPitch || '';
+              const noteEl = document.getElementById('followup-note');
+              if (noteEl) noteEl.value = fu.customNote || '';
+            }
           }
         } catch (err) {
           console.error(err);
@@ -3389,6 +3652,19 @@
           statusLbl.style.color = isEn ? 'var(--accent-cyan)' : 'var(--text-muted)';
         }
       });
+
+      // Toggle Follow-Up Active Label
+      const fuEnabledToggle = document.getElementById('followup-enabled');
+      if (fuEnabledToggle) {
+        fuEnabledToggle.addEventListener('change', (e) => {
+          const isEn = e.target.checked;
+          const statusLbl = document.getElementById('followup-status-label');
+          if (statusLbl) {
+            statusLbl.textContent = isEn ? 'Follow-Up Active' : 'Follow-Up Paused';
+            statusLbl.style.color = isEn ? 'var(--accent-pink)' : 'var(--text-muted)';
+          }
+        });
+      }
 
       // Save Drive Link Form
       document.getElementById('drive-form').addEventListener('submit', async (e) => {
@@ -3467,6 +3743,39 @@
         }
       });
 
+      // Save Follow-Up Email Form
+      const fuForm = document.getElementById('followup-settings-form');
+      if (fuForm) {
+        fuForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const followUpEmailSettings = {
+            enabled: document.getElementById('followup-enabled').checked,
+            delayDays: Number(document.getElementById('followup-days').value) || 4,
+            subject: document.getElementById('followup-subject').value.trim(),
+            heading: document.getElementById('followup-heading').value.trim(),
+            message: document.getElementById('followup-message').value.trim(),
+            patreonPitch: document.getElementById('followup-pitch').value.trim(),
+            customNote: document.getElementById('followup-note').value.trim(),
+          };
+
+          try {
+            const res = await fetch(`${API_BASE}/settings`, {
+              method: 'PUT',
+              headers: getAuthHeaders(),
+              body: JSON.stringify({ followUpEmailSettings }),
+            });
+
+            if (res.ok) {
+              showToast('Follow-Up email settings saved successfully!');
+            } else {
+              showToast('Failed to save Follow-Up settings', 'error');
+            }
+          } catch (err) {
+            showToast('Failed to save Follow-Up settings', 'error');
+          }
+        });
+      }
+
       // Send Test Thank You Email
       document.getElementById('thankyou-test-btn').addEventListener('click', async () => {
         const testEmail = prompt('Enter your email address to receive the test Thank You email:');
@@ -3509,7 +3818,194 @@
         }
       });
 
-      // Send Test Email
+      // Send Test Follow-Up Email
+      const fuTestBtn = document.getElementById('followup-test-btn');
+      if (fuTestBtn) {
+        fuTestBtn.addEventListener('click', async () => {
+          const testEmail = prompt('Enter your email address to receive the test Follow-Up email:');
+          if (!testEmail || !testEmail.includes('@')) return;
+
+          const subject = document.getElementById('followup-subject').value.trim();
+          const heading = document.getElementById('followup-heading').value.trim();
+          const message = document.getElementById('followup-message').value.trim();
+          const patreonPitch = document.getElementById('followup-pitch').value.trim();
+          const customNote = document.getElementById('followup-note').value.trim();
+
+          const origHtml = fuTestBtn.innerHTML;
+          fuTestBtn.disabled = true;
+          fuTestBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending test...';
+
+          try {
+            const res = await fetch(`${API_BASE}/admin/test-follow-up-email`, {
+              method: 'POST',
+              headers: getAuthHeaders(),
+              body: JSON.stringify({ testEmail, subject, heading, message, patreonPitch, customNote }),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+              showToast(data.message || 'Test Follow-Up email sent successfully!');
+            } else {
+              showToast(data.error || 'Failed to dispatch test follow-up email', 'error');
+            }
+          } catch (err) {
+            showToast('Network error while sending test email', 'error');
+          } finally {
+            fuTestBtn.disabled = false;
+            fuTestBtn.innerHTML = origHtml;
+          }
+        });
+      }
+
+      // Preview Follow-Up Email
+      const fuPreviewBtn = document.getElementById('followup-preview-btn');
+      if (fuPreviewBtn) {
+        fuPreviewBtn.addEventListener('click', () => {
+          const previewWin = window.open(`${API_BASE}/admin/preview-follow-up-email?token=${encodeURIComponent(token)}`, '_blank');
+          if (!previewWin) {
+            showToast('Pop-up blocked. Please allow pop-ups to preview the email.', 'error');
+          }
+        });
+      }
+
+      // Manual Run Auto Follow-Ups Now
+      const fuRunNowBtn = document.getElementById('followup-run-now-btn');
+      if (fuRunNowBtn) {
+        fuRunNowBtn.addEventListener('click', async () => {
+          const origHtml = fuRunNowBtn.innerHTML;
+          fuRunNowBtn.disabled = true;
+          fuRunNowBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking subscribers...';
+
+          try {
+            const res = await fetch(`${API_BASE}/admin/run-follow-up-now`, {
+              method: 'POST',
+              headers: getAuthHeaders(),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+              showToast(data.message || 'Follow-up job executed successfully!');
+              fetchSubscribers();
+            } else {
+              showToast(data.error || 'Failed to run follow-up job', 'error');
+            }
+          } catch (err) {
+            showToast('Error triggering follow-up job', 'error');
+          } finally {
+            fuRunNowBtn.disabled = false;
+            fuRunNowBtn.innerHTML = origHtml;
+          }
+        });
+      }
+
+      // ==========================================
+      // CUSTOM RECIPIENTS MODAL LOGIC
+      // ==========================================
+      window.openCustomEmailModal = function (type, prefillEmail = '') {
+        const modal = document.getElementById('custom-email-modal');
+        if (!modal) return;
+
+        const titleEl = document.getElementById('custom-email-modal-title');
+        const descEl = document.getElementById('custom-email-modal-desc');
+        const typeInput = document.getElementById('custom-email-modal-type');
+        const recipientsInput = document.getElementById('custom-modal-recipients');
+        const submitText = document.getElementById('custom-modal-submit-text');
+
+        typeInput.value = type;
+        if (prefillEmail) {
+          recipientsInput.value = prefillEmail;
+        } else {
+          recipientsInput.value = '';
+        }
+
+        if (type === 'thankyou') {
+          titleEl.innerHTML = '<i class="fa-solid fa-gift" style="color: var(--accent-cyan);"></i> Send Thank You & Free Drive Link';
+          descEl.textContent = 'Enter emails to immediately dispatch the Thank You email with your Google Drive download link.';
+          submitText.textContent = 'Send Thank You Email';
+        } else {
+          titleEl.innerHTML = '<i class="fa-solid fa-comments" style="color: var(--accent-pink);"></i> Send Follow-Up & Patreon Upsell';
+          descEl.textContent = 'Enter emails to immediately dispatch the 4-Day Follow-Up email with Patreon perks & 3D print check-in.';
+          submitText.textContent = 'Send Follow-Up Email';
+        }
+
+        modal.style.display = 'flex';
+        recipientsInput.focus();
+      };
+
+      window.closeCustomEmailModal = function () {
+        const modal = document.getElementById('custom-email-modal');
+        if (modal) modal.style.display = 'none';
+      };
+
+      const tyCustomSendBtn = document.getElementById('thankyou-custom-send-btn');
+      if (tyCustomSendBtn) {
+        tyCustomSendBtn.addEventListener('click', () => openCustomEmailModal('thankyou'));
+      }
+
+      const fuCustomSendBtn = document.getElementById('followup-custom-send-btn');
+      if (fuCustomSendBtn) {
+        fuCustomSendBtn.addEventListener('click', () => openCustomEmailModal('followup'));
+      }
+
+      // Custom Email Modal Form Submission
+      const customEmailModalForm = document.getElementById('custom-email-modal-form');
+      if (customEmailModalForm) {
+        customEmailModalForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const type = document.getElementById('custom-email-modal-type').value;
+          const rawText = document.getElementById('custom-modal-recipients').value;
+          const emails = parseEmailsFromText(rawText);
+
+          if (emails.length === 0) {
+            showToast('Please enter at least one valid email address', 'error');
+            return;
+          }
+
+          const btn = document.getElementById('custom-modal-submit-btn');
+          const origHtml = btn.innerHTML;
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+          try {
+            let res;
+            if (type === 'thankyou') {
+              const subject = document.getElementById('thankyou-subject').value.trim();
+              const customNote = document.getElementById('thankyou-note').value.trim();
+              res = await fetch(`${API_BASE}/admin/send-thank-you-custom`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ emails, subject, customNote }),
+              });
+            } else {
+              const subject = document.getElementById('followup-subject').value.trim();
+              const heading = document.getElementById('followup-heading').value.trim();
+              const message = document.getElementById('followup-message').value.trim();
+              const patreonPitch = document.getElementById('followup-pitch').value.trim();
+              const customNote = document.getElementById('followup-note').value.trim();
+              res = await fetch(`${API_BASE}/admin/send-follow-up-custom`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ emails, subject, heading, message, patreonPitch, customNote }),
+              });
+            }
+
+            const data = await res.json();
+            if (res.ok) {
+              showToast(data.message || `Dispatched to ${emails.length} recipient(s)!`);
+              closeCustomEmailModal();
+            } else {
+              showToast(data.error || 'Failed to dispatch custom emails', 'error');
+            }
+          } catch (err) {
+            showToast('Network error while dispatching emails', 'error');
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+          }
+        });
+      }
+
+      // Send Test Email (Marketing Campaign Broadcast)
       document.getElementById('send-test-btn').addEventListener('click', async () => {
         const testEmail = prompt('Enter your email address to receive the test broadcast:');
         if (!testEmail || !testEmail.includes('@')) return;
@@ -3552,7 +4048,7 @@
         }
       });
 
-      // Broadcast Form Submit (All vs Selected)
+      // Broadcast Form Submit (All vs Selected vs Custom)
       document.getElementById('broadcast-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -3567,7 +4063,17 @@
         let recipientEmails = null;
         let confirmMsg = '';
 
-        if (mktAudienceType === 'selected') {
+        if (mktAudienceType === 'custom') {
+          const raw = (document.getElementById('mkt-custom-emails-input').value || '').trim();
+          recipientEmails = parseEmailsFromText(raw);
+          if (recipientEmails.length === 0) {
+            showToast('Please enter at least one valid recipient email in the Custom box above!', 'error');
+            const picker = document.getElementById('mkt-custom-emails-picker');
+            if (picker) picker.scrollIntoView({ behavior: 'smooth' });
+            return;
+          }
+          confirmMsg = `Are you sure you want to send this email to ${recipientEmails.length} custom recipient(s)?`;
+        } else if (mktAudienceType === 'selected') {
           if (mktSelectedEmails.size === 0) {
             showToast('Please select at least one subscriber from the table above!', 'error');
             const picker = document.getElementById('mkt-subscribers-picker');
