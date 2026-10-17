@@ -22,6 +22,7 @@
 
     <style>
       :root {
+        color-scheme: dark;
         --bg-main: #0b0c10;
         --bg-secondary: #12141c;
         --bg-card: rgba(18, 20, 30, 0.75);
@@ -187,8 +188,21 @@
         background: rgba(255, 255, 255, 0.08);
       }
 
+      select,
+      .form-select,
+      .form-input,
+      .filter-input {
+        color-scheme: dark;
+      }
+
       select, .form-select {
         cursor: pointer;
+        background-color: #12141c;
+        color: #ffffff;
+      }
+
+      select:focus, .form-select:focus {
+        background-color: #161924;
       }
 
       option,
@@ -196,7 +210,7 @@
       .form-select option,
       .form-input option,
       .filter-input option {
-        background-color: #151722 !important;
+        background-color: #12141c !important;
         color: #ffffff !important;
         padding: 8px 12px;
       }
