@@ -49,6 +49,32 @@ If you enjoyed printing those free designs, you're going to fall in love with ou
       '💬 Exclusive Member Discord — Chat directly with the creators & fellow 3D makers',
     ],
   },
+
+  'first-month-50-off': {
+    key: 'first-month-50-off',
+    name: '🔥 Template 3: 50% OFF Your First Month Subscription!',
+    subject: '🔥 Special 50% OFF: Unlock Full Patreon Access for Half Price!',
+    badge: '50% OFF Special Offer',
+    badgeColor: '#f59e0b',
+    defaultHeading: 'Claim 50% OFF Your First Month on Patreon! 🔥🎉',
+    defaultMessage: `Hey {NAME}!
+
+As a valued free member of our Chibi Flex community, we have an exciting exclusive offer just for you!
+
+For a limited time, you can get 50% OFF your first month of Patreon subscription on any tier! That means you can join and instantly unlock our Giant Welcome Pack (20+ premium articulated designs), our latest exclusive monthly model drops, and full commercial printing rights — all for half price!
+
+Don't miss out on this special discount. Tap the button below to join now and take your 3D printing to the next level:`,
+    ctaText: '🔥 Claim 50% OFF & Join Patreon Now &rarr;',
+    ctaType: 'patreon',
+    secondaryHeading: 'What you unlock with your 50% discount:',
+    secondaryPoints: [
+      '🔥 50% OFF Your First Month — Premium articulated designs for half the price',
+      '🎁 Giant Welcome Pack Instantly — 20+ top-rated print-in-place flexi models ready to print',
+      '🚀 Monthly Fresh Drops — 5+ brand-new exclusive articulating designs every single month',
+      '💼 Commercial License Included — Sell physical prints legally at craft fairs & online',
+      '💬 VIP Discord & Polls — Vote on next month’s designs and connect with the community',
+    ],
+  },
 };
 
 export function renderPatreonEmail(templateKey, options = {}) {
@@ -94,6 +120,12 @@ export function renderPatreonEmail(templateKey, options = {}) {
 
   const primaryBtnLink = tpl.ctaType === 'patreon' ? patreonLink : driveLink;
   const primaryBtnText = options.ctaText || tpl.ctaText;
+  const primaryBtnGradient = templateKey === 'first-month-50-off'
+    ? 'linear-gradient(135deg, #f59e0b 0%, #ea580c 50%, #dc2626 100%)'
+    : 'linear-gradient(135deg, #ec4899 0%, #db2777 50%, #f43f5e 100%)';
+  const primaryBtnShadow = templateKey === 'first-month-50-off'
+    ? '0 8px 24px rgba(234, 88, 12, 0.45)'
+    : '0 8px 24px rgba(236, 72, 153, 0.4)';
 
   return `
   <!DOCTYPE html>
@@ -141,7 +173,7 @@ export function renderPatreonEmail(templateKey, options = {}) {
                 <div style="text-align: center; margin: 30px 0 25px 0;">
                   <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
                     <tr>
-                      <td style="border-radius: 12px; background: linear-gradient(135deg, #ec4899 0%, #db2777 50%, #f43f5e 100%); box-shadow: 0 8px 24px rgba(236, 72, 153, 0.4);">
+                      <td style="border-radius: 12px; background: ${primaryBtnGradient}; box-shadow: ${primaryBtnShadow};">
                         <a href="${primaryBtnLink}" target="_blank" style="padding: 16px 36px; border-radius: 12px; font-size: 15px; font-weight: 800; color: #ffffff; text-decoration: none; display: inline-block; letter-spacing: 0.3px;">
                           ${primaryBtnText}
                         </a>
