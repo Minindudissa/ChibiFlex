@@ -189,33 +189,37 @@ async function seedPatreonMembersFromCSV() {
       const line = lines[i];
       const parts = line.split(',');
       const name = parts[0]?.trim() || 'Patreon Member';
-      const email = parts[1]?.trim().toLowerCase();
+      const rawEmail = parts[1]?.trim().toLowerCase();
       const patronStatus = parts[3]?.trim() || 'Free Member';
       const isFreeMember = parts[5]?.trim() || 'Yes';
       const tier = parts[10]?.trim() || 'Free';
       const patronageSinceDate = parts[18]?.trim();
       const userId = parts[22]?.trim() || '';
 
-      if (email && email.includes('@')) {
-        bulkOps.push({
-          updateOne: {
-            filter: { email },
-            update: {
-              $setOnInsert: {
-                name,
-                email,
-                tier,
-                patronStatus,
-                isFreeMember,
-                userId,
-                patronageSinceDate: patronageSinceDate ? new Date(patronageSinceDate) : new Date(),
-                status: 'active',
-              },
+      const hasRealEmail = rawEmail && rawEmail.includes('@');
+      const email = hasRealEmail ? rawEmail : `no-email-${userId || ('user_' + i)}@patreon.placeholder`;
+      const status = hasRealEmail ? 'active' : 'inactive';
+      const notes = hasRealEmail ? '' : 'No email provided in Patreon export';
+
+      bulkOps.push({
+        updateOne: {
+          filter: { email },
+          update: {
+            $setOnInsert: {
+              name,
+              email,
+              tier,
+              patronStatus,
+              isFreeMember,
+              userId,
+              patronageSinceDate: patronageSinceDate ? new Date(patronageSinceDate) : new Date(),
+              status,
+              notes,
             },
-            upsert: true,
           },
-        });
-      }
+          upsert: true,
+        },
+      });
     }
 
     if (bulkOps.length > 0) {
@@ -1969,7 +1973,7 @@ app.get('/api/admin/patreon-members', requireAdmin, async (req, res) => {
     }
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.max(1, Math.min(200, parseInt(limit, 10) || 25));
+    const limitNum = Math.max(1, Math.min(10000, parseInt(limit, 10) || 5000));
     const skip = (pageNum - 1) * limitNum;
 
     const [total, members, totalAll, totalActive, totalEmailed] = await Promise.all([

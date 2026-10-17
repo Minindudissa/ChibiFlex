@@ -4614,16 +4614,29 @@
               outreachBadge = `<span class="model-badge" style="background: rgba(244, 63, 94, 0.15); color: #f43f5e;" title="Sent: ${escapeAttr(last.subject || '')} on ${formatDateTime(last.sentAt)}"><i class="fa-solid fa-check"></i> ${tplName} (${m.emailsSent.length})</span>`;
             }
 
+            const isPlaceholderEmail = (m.email || '').includes('@patreon.placeholder');
+            const emailDisplay = isPlaceholderEmail
+              ? `<span style="color: #94a3b8; font-size: 0.82rem; font-style: italic;"><i class="fa-solid fa-circle-exclamation" style="color: #f59e0b; margin-right: 4px;"></i> No email (Former Patron)</span>`
+              : escapeHtml(m.email);
+
+            const checkboxHtml = isPlaceholderEmail
+              ? `<input type="checkbox" class="custom-checkbox" disabled title="No email available for this member" style="opacity: 0.35; cursor: not-allowed;" />`
+              : `<input type="checkbox" class="custom-checkbox patreon-row-checkbox" data-email="${escapeAttr(emailKey)}" ${isChecked ? 'checked' : ''} />`;
+
+            const sendBtnHtml = isPlaceholderEmail
+              ? `<button type="button" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.8rem; opacity: 0.4; cursor: not-allowed;" disabled title="No email available for this member"><i class="fa-solid fa-paper-plane"></i></button>`
+              : `<button type="button" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.8rem;" title="Send email to this member" onclick="openDirectPatreonEmail('${escapeAttr(m.email)}', '${escapeAttr(m.name || '')}')"><i class="fa-solid fa-paper-plane" style="color: #f43f5e;"></i></button>`;
+
             const tr = document.createElement('tr');
             if (isChecked) tr.classList.add('row-selected');
 
             tr.innerHTML = `
               <td style="text-align: center;">
-                <input type="checkbox" class="custom-checkbox patreon-row-checkbox" data-email="${escapeAttr(emailKey)}" ${isChecked ? 'checked' : ''} />
+                ${checkboxHtml}
               </td>
               <td>${startIndex + idx + 1}</td>
               <td><strong>${escapeHtml(m.name || 'Patreon Member')}</strong></td>
-              <td>${escapeHtml(m.email)}</td>
+              <td>${emailDisplay}</td>
               <td>
                 <span class="model-badge" style="background: rgba(0, 210, 255, 0.12); color: var(--accent-cyan);">${escapeHtml(m.tier || 'Free')}</span>
                 <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 4px;">${escapeHtml(m.patronStatus || '')}</span>
@@ -4635,9 +4648,7 @@
               <td>${outreachBadge}</td>
               <td style="text-align: right;">
                 <div style="display: inline-flex; gap: 6px;">
-                  <button type="button" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.8rem;" title="Send email to this member" onclick="openDirectPatreonEmail('${escapeAttr(m.email)}', '${escapeAttr(m.name || '')}')">
-                    <i class="fa-solid fa-paper-plane" style="color: #f43f5e;"></i>
-                  </button>
+                  ${sendBtnHtml}
                   <button type="button" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.8rem;" title="Edit member" onclick="openEditPatreonModal('${m._id}')">
                     <i class="fa-solid fa-pen-to-square"></i>
                   </button>
@@ -4649,17 +4660,19 @@
             `;
 
             const cb = tr.querySelector('.patreon-row-checkbox');
-            cb.addEventListener('change', (e) => {
-              if (e.target.checked) {
-                patreonSelectedEmails.add(emailKey);
-                tr.classList.add('row-selected');
-              } else {
-                patreonSelectedEmails.delete(emailKey);
-                tr.classList.remove('row-selected');
-              }
-              updatePatreonSelectionBadge();
-              updatePatreonMasterCheckbox(slice);
-            });
+            if (cb) {
+              cb.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                  patreonSelectedEmails.add(emailKey);
+                  tr.classList.add('row-selected');
+                } else {
+                  patreonSelectedEmails.delete(emailKey);
+                  tr.classList.remove('row-selected');
+                }
+                updatePatreonSelectionBadge();
+                updatePatreonMasterCheckbox(slice);
+              });
+            }
 
             tbody.appendChild(tr);
           });
@@ -4710,14 +4723,15 @@
       function updatePatreonMasterCheckbox(slice) {
         const master = document.getElementById('patreon-master-checkbox');
         if (!master) return;
-        if (slice.length === 0) {
+        const validSlice = slice.filter((m) => !(m.email || '').includes('@patreon.placeholder'));
+        if (validSlice.length === 0) {
           master.checked = false;
           master.indeterminate = false;
           return;
         }
-        const totalCheckedInSlice = slice.filter((m) => patreonSelectedEmails.has((m.email || '').toLowerCase().trim())).length;
-        master.checked = totalCheckedInSlice === slice.length;
-        master.indeterminate = totalCheckedInSlice > 0 && totalCheckedInSlice < slice.length;
+        const totalCheckedInSlice = validSlice.filter((m) => patreonSelectedEmails.has((m.email || '').toLowerCase().trim())).length;
+        master.checked = totalCheckedInSlice === validSlice.length;
+        master.indeterminate = totalCheckedInSlice > 0 && totalCheckedInSlice < validSlice.length;
       }
 
       // Master checkbox change
@@ -4728,6 +4742,7 @@
           const { slice } = getPaginatedSlice(filtered, patreonCurrentPage, patreonPerPage);
           slice.forEach((m) => {
             const emailKey = (m.email || '').toLowerCase().trim();
+            if (emailKey.includes('@patreon.placeholder')) return;
             if (e.target.checked) {
               patreonSelectedEmails.add(emailKey);
             } else {
@@ -4746,7 +4761,7 @@
           const filtered = getFilteredPatreonMembers();
           filtered.forEach((m) => {
             const emailKey = (m.email || '').toLowerCase().trim();
-            if (emailKey) patreonSelectedEmails.add(emailKey);
+            if (emailKey && !emailKey.includes('@patreon.placeholder')) patreonSelectedEmails.add(emailKey);
           });
           renderPatreonTab();
           updatePatreonSelectionBadge();
@@ -5028,7 +5043,7 @@
           submitText.textContent = `Send to ${patreonSelectedEmails.size} Selected Member(s)`;
         } else {
           patreonDirectRecipient = null;
-          const activeTotal = allPatreonMembers.filter((m) => m.status === 'active').length;
+          const activeTotal = allPatreonMembers.filter((m) => m.status === 'active' && !(m.email || '').includes('@patreon.placeholder')).length;
           indicator.textContent = `📢 Target Audience: ALL Active Patreon Members (${activeTotal} Recipients)`;
           submitText.textContent = `Send to All Active Members (${activeTotal})`;
         }
